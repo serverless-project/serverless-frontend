@@ -1,4 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router';
+import { homeBaseRoutePath } from "/@/router/static/homeBase";
 
 const pageTitle = (name: string): string => {
     return `pagesTitle.${name}`;
@@ -25,14 +26,6 @@ const staticRoutes: Array<RouteRecordRaw> = [
         },
     },
     {
-        path: '/home',
-        name: 'home',
-        component: () => import('/@/views/home.vue'),
-        meta: {
-            title: pageTitle('home'),
-        }
-    },
-    {
         path: '/:path(.*)*',
         redirect: '/404',
     },
@@ -52,6 +45,20 @@ const staticRoutes: Array<RouteRecordRaw> = [
         component: () => import('/@/views/common/error/401.vue'),
         meta: {
             title: pageTitle('noPower'),
+        },
+    },
+    {
+        path: homeBaseRoutePath + ':path(.*)*',
+        redirect: (to) => {
+            return {
+                name: 'homeMainLoading',
+                params: {
+                    to: JSON.stringify({
+                        path: to.path,
+                        query: to.query,
+                    }),
+                },
+            }
         },
     },
 ];

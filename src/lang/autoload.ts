@@ -1,4 +1,4 @@
-import { adminBaseRoutePath } from '/@/router/static/adminBase'
+import { homeBaseRoutePath } from '/src/router/static/homeBase';
 
 /*
  * 语言包按需加载映射表
@@ -7,8 +7,8 @@ import { adminBaseRoutePath } from '/@/router/static/adminBase'
  */
 export default {
     '/': ['./frontend/${lang}/index.ts'],
-    [adminBaseRoutePath + '/moduleStore']: ['./backend/${lang}/module.ts'],
-    [adminBaseRoutePath + '/user/rule']: ['./backend/${lang}/auth/rule.ts'],
-    [adminBaseRoutePath + '/user/scoreLog']: ['./backend/${lang}/user/moneyLog.ts'],
-    [adminBaseRoutePath + '/crud/crud']: ['./backend/${lang}/crud/log.ts', './backend/${lang}/crud/state.ts'],
-}
+    [homeBaseRoutePath + '/moduleStore']: ['./backend/${lang}/module.ts'],
+    [homeBaseRoutePath + '/user/rule']: ['./backend/${lang}/auth/rule.ts'],
+    [homeBaseRoutePath + '/user/scoreLog']: ['./backend/${lang}/user/moneyLog.ts'],
+    [homeBaseRoutePath + '/crud/crud']: ['./backend/${lang}/crud/log.ts', './backend/${lang}/crud/state.ts'],
+};

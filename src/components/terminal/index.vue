@@ -184,7 +184,6 @@ import type { TimelineItemProps } from 'element-plus'
 import { ElMessageBox, ElScrollbar } from 'element-plus'
 import { nextTick, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { postChangeTerminalConfig } from '/@/api/common'
 import FormItem from '/@/components/formItem/index.vue'
 import { taskStatus } from '/@/stores/constant/terminalTaskStatus'
 import { useTerminal } from '/@/stores/terminal'
@@ -267,15 +266,15 @@ const webBuild = () => {
 
 const changePackageManager = (val: string) => {
     state.packageManagerLoading = true
-    postChangeTerminalConfig({ manager: val })
-        .then((res) => {
-            if (res.code == 1) {
-                terminal.changePackageManager(val)
-            }
-        })
-        .finally(() => {
-            state.packageManagerLoading = false
-        })
+    // postChangeTerminalConfig({ manager: val })
+    //     .then((res) => {
+    //         if (res.code == 1) {
+    //             terminal.changePackageManager(val)
+    //         }
+    //     })
+    //     .finally(() => {
+    //         state.packageManagerLoading = false
+    //     })
 }
 
 const changeRegistry = (val: string, type: SourceType) => {

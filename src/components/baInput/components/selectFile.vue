@@ -44,8 +44,6 @@ import { useI18n } from 'vue-i18n'
 import Table from '/@/components/table/index.vue'
 import TableHeader from '/@/components/table/header/index.vue'
 import baTableClass from '/@/utils/baTable'
-import { previewRenderFormatter } from '/@/views/backend/routine/attachment'
-import { baTableApi } from '/@/api/common'
 
 interface Props {
     type?: 'image' | 'file'
@@ -89,7 +87,7 @@ const optBtn: OptButton[] = [
         },
     },
 ]
-const baTable = new baTableClass(new baTableApi('/admin/routine.Attachment/'), {
+const baTable = new baTableClass(null as any, {
     acceptQuery: false,
     column: [
         {
@@ -114,7 +112,6 @@ const baTable = new baTableClass(new baTableApi('/admin/routine.Attachment/'), {
             label: t('utils.preview'),
             prop: 'suffix',
             align: 'center',
-            formatter: previewRenderFormatter,
             render: 'image',
             operator: false,
         },

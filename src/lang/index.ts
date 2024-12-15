@@ -34,17 +34,13 @@ export async function loadLang(app: App) {
     // 按需加载语言包文件的句柄
     if (locale == 'zh-cn') {
         window.loadLangHandle = {
-            ...import.meta.glob('./backend/zh-cn/**/*.ts'),
-            ...import.meta.glob('./frontend/zh-cn/**/*.ts'),
-            ...import.meta.glob('./backend/zh-cn.ts'),
-            ...import.meta.glob('./frontend/zh-cn.ts'),
+            ...import.meta.glob('./home/zh-cn/**/*.ts'),
+            ...import.meta.glob('./home/zh-cn.ts'),
         }
     } else {
         window.loadLangHandle = {
-            ...import.meta.glob('./backend/en/**/*.ts'),
-            ...import.meta.glob('./frontend/en/**/*.ts'),
-            ...import.meta.glob('./backend/en.ts'),
-            ...import.meta.glob('./frontend/en.ts'),
+            ...import.meta.glob('./home/en/**/*.ts'),
+            ...import.meta.glob('./home/en.ts'),
         }
     }
 

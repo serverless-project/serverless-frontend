@@ -67,7 +67,6 @@
 import type { ElSelect } from 'element-plus'
 import { debounce, isEmpty } from 'lodash-es'
 import { getCurrentInstance, nextTick, onMounted, onUnmounted, reactive, ref, toRaw, watch } from 'vue'
-import { getSelectData } from '/@/api/common'
 import { useConfig } from '/@/stores/config'
 import { getArrayKey } from '/@/utils/common'
 import { shortUuid } from '/@/utils/random'
@@ -209,22 +208,22 @@ const getData = (initValue: valueTypes = '') => {
     state.params.page = state.currentPage
     state.params.initKey = props.pk
     state.params.initValue = initValue
-    getSelectData(props.remoteUrl, state.keyword, state.params)
-        .then((res) => {
-            let opts = res.data.options ? res.data.options : res.data.list
-            if (typeof props.labelFormatter === 'function') {
-                for (const key in opts) {
-                    opts[key][props.field] = props.labelFormatter(opts[key], key)
-                }
-            }
-            state.options = opts
-            state.total = res.data.total ?? 0
-            state.optionValidityFlag = state.keyword || (typeof initValue === 'object' ? !isEmpty(initValue) : initValue) ? false : true
-        })
-        .finally(() => {
-            state.loading = false
-            state.initializeFlag = true
-        })
+    // getSelectData(props.remoteUrl, state.keyword, state.params)
+    //     .then((res) => {
+    //         let opts = res.data.options ? res.data.options : res.data.list
+    //         if (typeof props.labelFormatter === 'function') {
+    //             for (const key in opts) {
+    //                 opts[key][props.field] = props.labelFormatter(opts[key], key)
+    //             }
+    //         }
+    //         state.options = opts
+    //         state.total = res.data.total ?? 0
+    //         state.optionValidityFlag = state.keyword || (typeof initValue === 'object' ? !isEmpty(initValue) : initValue) ? false : true
+    //     })
+    //     .finally(() => {
+    //         state.loading = false
+    //         state.initializeFlag = true
+    //     })
 }
 
 const onSelectCurrentPageChange = (val: number) => {
