@@ -1,11 +1,11 @@
 export default {
     printWidth: 150,
     // 指定每个缩进级别的空格数
-    tabWidth: 4,
+    // tabWidth: 4,
     // 使用制表符而不是空格缩进行
     useTabs: false,
     // 在语句末尾打印分号
-    semi: false,
+    // semi: true,
     // 使用单引号而不是双引号
     singleQuote: true,
     // 更改引用对象属性的时间 可选值"<as-needed|consistent|preserve>"

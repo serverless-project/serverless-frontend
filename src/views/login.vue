@@ -1,49 +1,52 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
-const username = ref("");
-const password = ref("");
-// const container = document.querySelector(".container");
-// const registerBtn = document.querySelector(".register-btn");
-// const loginBtn = document.querySelector(".login-btn");
-//
-// registerBtn.addEventListener("click", () => {
-//   container.classList.add("active");
-// });
-//
-// loginBtn.addEventListener("click", () => {
-//   container.classList.remove("active");
-// });
+const username = ref('');
+const password = ref('');
+
+onMounted(() => {
+  const container = document.querySelector('.container') as Element;
+  const registerBtn = document.querySelector('.register-btn') as Element;
+  const loginBtn = document.querySelector('.login-btn') as Element;
+
+  registerBtn.addEventListener('click', () => {
+    container.classList.add('active');
+  });
+
+  loginBtn.addEventListener('click', () => {
+    container.classList.remove('active');
+  });
+});
+
+const router = useRouter();
 
 const login = () => {
-
-}
+  // TODO: 调用后端登录接口
+  router.push({ name: 'home' });
+};
 </script>
 
 <template>
-  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
   <div class="body">
     <div class="container">
       <div class="form-box login">
         <form action="">
-          <h1>登录账号</h1>
+          <h1>欢迎</h1>
           <div class="input-box">
-            <input type="text" placeholder="username"
-                   v-model="username"
-                   required>
-            <i class='bx bxs-user'></i>
+            <input type="text" placeholder="username" v-model="username" />
+            <i class="bx bxs-user"></i>
           </div>
           <div class="input-box">
             <!-- placeholder是未输入时的背景提示 -->
-            <input type="password" placeholder="password"
-                   v-model="password"
-                   required>
-            <i class='bx bxs-lock-alt'></i>
+            <input type="password" placeholder="password" v-model="password" />
+            <i class="bx bxs-lock-alt"></i>
           </div>
           <!--        <div class="forgot-link">-->
           <!--          <a href="">找回密码</a>-->
           <!--        </div>-->
-          <button type="submit" class="btn">登录</button>
+          <button @click="login" class="btn">登录</button>
           <!--        <p>使用其他社交平台登录</p>-->
           <!--        &lt;!&ndash; 社交平台登录图标和名称 &ndash;&gt;-->
           <!--        <div class="social-icons">-->
@@ -58,48 +61,43 @@ const login = () => {
         </form>
       </div>
 
-      <!--    <div class="form-box register">-->
-      <!--      <form action="">-->
-      <!--        <h1>注册</h1>-->
-      <!--        <div class="input-box">-->
-      <!--          <input type="text" placeholder="Username"-->
-      <!--                 required>-->
-      <!--          <i class='bx bxs-user'></i>-->
-      <!--        </div>-->
-      <!--        <div class="input-box">-->
-      <!--          <input type="email" placeholder="Email"-->
-      <!--                 required>-->
-      <!--          <i class='bx bx-envelope bx-flip-horizontal'></i>-->
-      <!--        </div>-->
-      <!--        <div class="input-box">-->
-      <!--          &lt;!&ndash; placeholder是未输入时的背景提示 &ndash;&gt;-->
-      <!--          <input type="password" placeholder="password"-->
-      <!--                 required>-->
-      <!--          <i class='bx bxs-lock-alt'></i>-->
-      <!--        </div>-->
+      <div class="form-box register">
+        <form action="">
+          <h1>注册</h1>
+          <div class="input-box">
+            <input type="text" placeholder="Username" required />
+            <i class="bx bxs-user"></i>
+          </div>
+          <div class="input-box">
+            <input type="email" placeholder="Email" required />
+            <i class="bx bx-envelope bx-flip-horizontal"></i>
+          </div>
+          <div class="input-box">
+            <!-- placeholder是未输入时的背景提示 -->
+            <input type="password" placeholder="password" required />
+            <i class="bx bxs-lock-alt"></i>
+          </div>
 
-      <!--        <button type="submit" class="btn">确定</button>-->
-      <!--        <p>使用其他社交平台登录</p>-->
-      <!--        &lt;!&ndash; 社交平台登录图标和名称 &ndash;&gt;-->
-      <!--        <div class="social-icons">-->
-      <!--          <a href=""><img :src="require('/@/assets/icons/mingcute_qq-line.svg')" alt="1"></a>-->
-      <!--          <a href=""><img :src="require('/@/assets/icons/hugeicons_wechat.svg')" alt="2"></a>-->
+          <!--        <button type="submit" class="btn">确定</button>-->
+          <!--        <p>使用其他社交平台登录</p>-->
+          <!--        &lt;!&ndash; 社交平台登录图标和名称 &ndash;&gt;-->
+          <!--        <div class="social-icons">-->
+          <!--          <a href=""><img :src="require('/@/assets/icons/mingcute_qq-line.svg')" alt="1"></a>-->
+          <!--          <a href=""><img :src="require('/@/assets/icons/hugeicons_wechat.svg')" alt="2"></a>-->
 
-      <!--          &lt;!&ndash; <a href="#"><i class='bx bxl-facebook'></i></a>-->
-      <!--          <a href="#"><i class='bx bxl-github' ></i></a>-->
-      <!--          <a href="#"><i class='bx bxl-linkedin' ></i></a> &ndash;&gt;-->
-      <!--        </div>-->
-      <!--      </form>-->
-
-      <!--    </div>-->
+          <!--          &lt;!&ndash; <a href="#"><i class='bx bxl-facebook'></i></a>-->
+          <!--          <a href="#"><i class='bx bxl-github' ></i></a>-->
+          <!--          <a href="#"><i class='bx bxl-linkedin' ></i></a> &ndash;&gt;-->
+          <!--        </div>-->
+        </form>
+      </div>
 
       <div class="toggle-box">
         <div class="toggle-panel toggel-left">
-          <h1>欢迎</h1>
+          <h1>LOGO</h1>
           <p>未创建账号</p>
 
-          <button class="btn register-btn">创建</button>
-
+          <button class="btn register-btn">注册</button>
         </div>
         <div class="toggle-panel toggel-right">
           <h1>欢迎回来</h1>
@@ -109,7 +107,6 @@ const login = () => {
       </div>
     </div>
   </div>
-
 </template>
 
 <style scoped lang="scss">
@@ -135,7 +132,7 @@ const login = () => {
   background: #fff;
   border-radius: 30px;
   /* 盒子圆角 */
-  box-shadow: 0 0 30px rgba(0, 0, 0, .2);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
   /* 隐藏多余出界的部分 */
   overflow: hidden;
 }
@@ -154,7 +151,9 @@ const login = () => {
   padding: 40px;
   /* 设置优先看到的顺序 */
   z-index: 1;
-  transition: .6s ease-in-out 1.2s, visibility 0s 1s;
+  transition:
+    0.6s ease-in-out 1.2s,
+    visibility 0s 1s;
 }
 
 .container.active .form-box {
@@ -171,7 +170,7 @@ const login = () => {
 
 form {
   /* background: purple; */
-  width: 100%
+  width: 100%;
 }
 
 .container h1 {
@@ -301,7 +300,7 @@ form {
   justify-content: center;
   align-items: center;
   z-index: 2;
-  transition: .6s ease-in-out;
+  transition: 0.6s ease-in-out;
 }
 
 .toggle-panel.toggel-left {
@@ -311,12 +310,12 @@ form {
 
 .container.active .toggle-panel.toggel-left {
   left: -50%;
-  transition-delay: .6s;
+  transition-delay: 0.6s;
 }
 
 .toggle-panel.toggel-right {
   right: -50%;
-  transition-delay: .6s;
+  transition-delay: 0.6s;
 }
 
 .container.active .toggle-panel.toggel-right {

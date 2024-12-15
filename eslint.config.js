@@ -1,9 +1,9 @@
-import js from '@eslint/js'
-import eslintConfigPrettier from 'eslint-config-prettier'
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
-import eslintPluginVue from 'eslint-plugin-vue'
-import globals from 'globals'
-import ts from 'typescript-eslint'
+import js from '@eslint/js';
+import eslintConfigPrettier from 'eslint-config-prettier';
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import eslintPluginVue from 'eslint-plugin-vue';
+import globals from 'globals';
+import ts from 'typescript-eslint';
 
 export default [
     // 三大基本推荐规则
@@ -98,11 +98,11 @@ export default [
         files: ['**/*.{ts,tsx,vue,js}'],
         rules: {
             'prettier/prettier': [
-                'warn', // 使用警告而不是错误
+                'off', // 使用警告而不是错误
                 {
                     endOfLine: 'auto', // eslint 无需检查文件换行符
                 },
             ],
         },
     },
-]
+];
