@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { useEventListener, useTemplateRefsList, useTransition } from '@vueuse/core';
 import * as echarts from 'echarts';
-import { CSSProperties, nextTick, onActivated, onBeforeMount, onMounted, onUnmounted, reactive, toRefs, watch } from 'vue';
+import { ComputedRef, CSSProperties, nextTick, onActivated, onBeforeMount, onMounted, onUnmounted, reactive, Ref, ref, toRefs, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import coffeeSvg from '/@/assets/dashboard/coffee.svg';
-import headerSvg from '/@/assets/dashboard/header-1.svg';
 import { WORKING_TIME } from '/@/stores/constant/cacheKey';
 import { useNavTabs } from '/@/stores/navTabs';
-import { fullUrl, getGreet } from '/@/utils/common';
+import { fullUrl } from '/@/utils/common';
 import { Local } from '/@/utils/storage';
-import {useUserInfo} from "/@/stores/userInfo";
+import { useUserInfo } from '/@/stores/userInfo';
+import Icon from '/@/components/icon/index.vue';
 
 let workTimer: number;
 
@@ -57,14 +56,6 @@ const statisticValueStyle: CSSProperties = {
 // index().then((res) => {
 //   state.remark = res.data.remark;
 // });
-
-const initCountUp = () => {
-  // 虚拟数据
-  countUpRefs.userRegNumber.value = 5456;
-  countUpRefs.fileNumber.value = 1234;
-  countUpRefs.usersNumber.value = 9486;
-  countUpRefs.addonsNumber.value = 875;
-};
 
 const initUserGrowthChart = () => {
   const userGrowthChart = echarts.init(chartRefs.value[0] as HTMLElement);
@@ -479,81 +470,88 @@ watch(
     echartsResize();
   }
 );
+
+class Panel {
+  name: string;
+  icon: {
+    name: string;
+    color: string;
+  };
+  number: Ref<number>;
+  numberOutput: ComputedRef<number>;
+  metric: string;
+
+  constructor(name: string, icon: { name: string; color: string }, number: number, metric: string) {
+    this.name = name;
+    this.icon = icon;
+    this.number = ref(number);
+    this.numberOutput = useTransition(this.number, { duration: 1500 });
+    this.metric = metric;
+  }
+}
+
+const panelsRef = ref<Panel[]>([
+  new Panel(
+    '已部署应用',
+    {
+      name: 'fa fa-object-group',
+      color: '#F48595',
+    },
+    0,
+    '6/8'
+  ),
+  new Panel(
+    '项目2',
+    {
+      name: 'fa fa-line-chart',
+      color: '#8595F4',
+    },
+    0,
+    '某指标'
+  ),
+  new Panel(
+    '项目3',
+    {
+      name: 'fa fa-users',
+      color: '#74A8B5',
+    },
+    0,
+    '某指标'
+  ),
+  new Panel(
+    '项目4',
+    {
+      name: 'fa fa-file-text',
+      color: '#AD85F4',
+    },
+    0,
+    '某指标'
+  ),
+]);
+
+const mockNumbers = [8, 5456, 9486, 875];
+
+const initCountUp = () => {
+  // TODO: 从后端获取数据
+  for (let i = 0; i < panelsRef.value.length; i++) {
+    panelsRef.value[i].number = mockNumbers[i];
+  }
+};
 </script>
 
 <template>
   <div class="default-main">
-    <div class="banner">
-      <el-row :gutter="10">
-        <el-col :md="24" :lg="18">
-          <div class="welcome suspension">
-            <img class="welcome-img" :src="headerSvg" alt="" />
-            <div class="welcome-text">
-              <div class="welcome-title">{{ userInfo.nickname + t('utils.comma') + getGreet() }}</div>
-              <div class="welcome-note">{{ state.remark }}</div>
-            </div>
-          </div>
-        </el-col>
-        <el-col :lg="6" class="hidden-md-and-down">
-          <div class="working">
-            <img class="working-coffee" :src="coffeeSvg" alt="" />
-            <div class="working-text">
-              {{ t('dashboard.You have worked today') }}<span class="time">{{ state.workingTimeFormat }}</span>
-            </div>
-            <div @click="onChangeWorkState()" class="working-opt working-rest">
-              {{ state.pauseWork ? t('dashboard.Continue to work') : t('dashboard.have a bit of rest') }}
-            </div>
-          </div>
-        </el-col>
-      </el-row>
-    </div>
     <div class="small-panel-box">
       <el-row :gutter="20">
-        <el-col :sm="12" :lg="6">
+        <el-col :sm="12" :lg="6" v-for="(panel, $index) in panelsRef" :key="$index">
           <div class="small-panel user-reg suspension">
-            <div class="small-panel-title">{{ t('dashboard.Member registration') }}</div>
+            <div class="small-panel-title">{{ panel.name }}</div>
             <div class="small-panel-content">
               <div class="content-left">
-                <Icon color="#8595F4" size="20" name="fa fa-line-chart" />
-                <el-statistic :value="userRegNumberOutput" :value-style="statisticValueStyle" />
+                <Icon :color="panel.icon.color" size="20" :name="panel.icon.name" />
+                <el-statistic :value="panel.numberOutput" :value-style="statisticValueStyle" />
               </div>
-              <div class="content-right">+14%</div>
-            </div>
-          </div>
-        </el-col>
-        <el-col :sm="12" :lg="6">
-          <div class="small-panel file suspension">
-            <div class="small-panel-title">{{ t('dashboard.Number of attachments Uploaded') }}</div>
-            <div class="small-panel-content">
-              <div class="content-left">
-                <Icon color="#AD85F4" size="20" name="fa fa-file-text" />
-                <el-statistic :value="fileNumberOutput" :value-style="statisticValueStyle" />
-              </div>
-              <div class="content-right">+50%</div>
-            </div>
-          </div>
-        </el-col>
-        <el-col :sm="12" :lg="6">
-          <div class="small-panel users suspension">
-            <div class="small-panel-title">{{ t('dashboard.Total number of members') }}</div>
-            <div class="small-panel-content">
-              <div class="content-left">
-                <Icon color="#74A8B5" size="20" name="fa fa-users" />
-                <el-statistic :value="usersNumberOutput" :value-style="statisticValueStyle" />
-              </div>
-              <div class="content-right">+28%</div>
-            </div>
-          </div>
-        </el-col>
-        <el-col :sm="12" :lg="6">
-          <div class="small-panel addons suspension">
-            <div class="small-panel-title">{{ t('dashboard.Number of installed plug-ins') }}</div>
-            <div class="small-panel-content">
-              <div class="content-left">
-                <Icon color="#F48595" size="20" name="fa fa-object-group" />
-                <el-statistic :value="addonsNumberOutput" :value-style="statisticValueStyle" />
-              </div>
-              <div class="content-right">+88%</div>
+              <div class="content-right">{{ panel.metric}}</div>
             </div>
           </div>
         </el-col>
