@@ -94,6 +94,13 @@ export interface MemberCenter {
     navUserMenus: RouteRecordRaw[]
 }
 
+export interface UserInfo {
+    id: number
+    username: string
+    nickname: string
+    avatar: string
+}
+
 export interface AdminInfo {
     id: number
     username: string
@@ -106,7 +113,7 @@ export interface AdminInfo {
     super: boolean
 }
 
-export interface UserInfo {
+export interface LUserInfo {
     id: number
     username: string
     nickname: string

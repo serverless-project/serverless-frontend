@@ -1,7 +1,7 @@
 import { ElNotification } from 'element-plus'
 import { defineStore } from 'pinia'
 import { nextTick, reactive } from 'vue'
-import { buildTerminalUrl } from '/@/api/common'
+// import { buildTerminalUrl } from '/@/api/common'
 import { i18n } from '/@/lang/index'
 import { STORE_TERMINAL } from '/@/stores/constant/cacheKey'
 import { taskStatus } from '/@/stores/constant/terminalTaskStatus'
@@ -9,6 +9,7 @@ import type { Terminal } from '/@/stores/interface/index'
 import { timeFormat } from '/@/utils/common'
 import { uuid } from '/@/utils/random'
 import { closeHotUpdate, openHotUpdate } from '/@/utils/vite'
+import {buildTerminalUrl} from "/@/api/common";
 
 export const useTerminal = defineStore(
     'terminal',
@@ -118,7 +119,7 @@ export const useTerminal = defineStore(
             }
 
             // 检查是否有已经失败的任务
-            if (state.show === false) {
+            if (!state.show) {
                 for (const key in state.taskList) {
                     if (state.taskList[key].status == taskStatus.Failed || state.taskList[key].status == taskStatus.Unknown) {
                         ElNotification({

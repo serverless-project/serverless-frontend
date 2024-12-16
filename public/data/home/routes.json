@@ -38,7 +38,7 @@
                 "icon": "fa fa-code",
                 "menu_type": "tab",
                 "url": "",
-                "component": "",
+                "component": "/src/views/home/testView.vue",
                 "keepalive": "test",
                 "extend": "none",
                 "children": []

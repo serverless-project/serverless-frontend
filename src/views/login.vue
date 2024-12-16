@@ -23,7 +23,9 @@ const router = useRouter();
 
 const login = () => {
   // TODO: 调用后端登录接口
-  router.push({ name: 'home' });
+  router.push({ path: '/home' }).catch((err) => {
+    console.log(err);
+  });
 };
 </script>
 
@@ -32,7 +34,7 @@ const login = () => {
   <div class="body">
     <div class="container">
       <div class="form-box login">
-        <form action="">
+        <form @submit.prevent>
           <h1>欢迎</h1>
           <div class="input-box">
             <input type="text" placeholder="username" v-model="username" />

@@ -1,13 +1,13 @@
-import router from "/@/router/index";
-import type { RouteLocationRaw, RouteRecordRaw } from "vue-router";
-import { isNavigationFailure, NavigationFailureType } from "vue-router";
-import { ElNotification } from "element-plus";
-import { useConfig } from "/@/stores/config";
-import { useNavTabs } from "/@/stores/navTabs";
-import { closeShade } from "/@/utils/pageShade";
-import { i18n } from "/@/lang";
-import { compact, reverse } from "lodash-es";
-import homeBaseRoute from "/@/router/static/homeBase";
+import router from '/@/router/index';
+import type { RouteLocationRaw, RouteRecordRaw } from 'vue-router';
+import { isNavigationFailure, NavigationFailureType } from 'vue-router';
+import { ElNotification } from 'element-plus';
+import { useConfig } from '/@/stores/config';
+import { useNavTabs } from '/@/stores/navTabs';
+import { closeShade } from '/@/utils/pageShade';
+import { i18n } from '/@/lang';
+import { compact, reverse } from 'lodash-es';
+import homeBaseRoute from '/@/router/static/homeBase';
 
 /**
  * 导航失败有错误消息的路由push
@@ -89,48 +89,20 @@ export const onClickMenu = (menu: RouteRecordRaw) => {
 };
 
 /**
- * 处理前台的路由
- * @param routes 路由规则
- * @param menus 会员中心菜单路由规则
+ * 处理主页的路由
  */
-export const handleFrontendRoute = (routes: any, menus: any) => {
-    // const siteConfig = useSiteConfig()
-    // const memberCenter = useMemberCenter()
-    // const viewsComponent = import.meta.glob('/src/views/frontend/**/*.vue')
-    //
-    // if (routes.length) {
-    //     addRouteAll(viewsComponent, routes, '', true)
-    //     memberCenter.mergeAuthNode(handleAuthNode(routes, '/'))
-    //     siteConfig.setHeadNav(handleMenuRule(routes, '/', ['nav']))
-    //     memberCenter.mergeNavUserMenus(handleMenuRule(routes, '/', ['nav_user_menu']))
-    // }
-    // if (menus.length && isEmpty(memberCenter.state.viewRoutes)) {
-    //     addRouteAll(viewsComponent, menus, memberCenterBaseRoute.name as string)
-    //     const menuMemberCenterBaseRoute = (memberCenterBaseRoute.path as string) + '/'
-    //     memberCenter.mergeAuthNode(handleAuthNode(menus, menuMemberCenterBaseRoute))
-    //
-    //     memberCenter.mergeNavUserMenus(handleMenuRule(menus, '/', ['nav_user_menu']))
-    //     memberCenter.setShowHeadline(menus.length > 1)
-    //     memberCenter.setViewRoutes(handleMenuRule(menus, menuMemberCenterBaseRoute))
-    // }
-};
-
-/**
- * 处理后台的路由
- */
-export const handleMenuRoute = (routes: any) => {
+export const handleHomeRoute = (routes: any) => {
     const viewsComponent = import.meta.glob('/src/views/home/**/*.vue');
     addRouteAll(viewsComponent, routes, homeBaseRoute.name as string);
-    const menuAdminBaseRoute = (homeBaseRoute.path as string) + '/';
+    const menuHomeBaseRoute = (homeBaseRoute.path as string) + '/';
 
     // 更新stores中的路由菜单数据
     const navTabs = useNavTabs();
-    navTabs.setTabsViewRoutes(handleMenuRule(routes, menuAdminBaseRoute));
-    navTabs.fillAuthNode(handleAuthNode(routes, menuAdminBaseRoute));
+    navTabs.setTabsViewRoutes(handleMenuRule(routes, menuHomeBaseRoute));
 };
 
 /**
- * 获取菜单的paths
+ * 获取菜单的 paths
  */
 export const getMenuPaths = (menus: RouteRecordRaw[]): string[] => {
     let menuPaths: string[] = [];
@@ -144,7 +116,7 @@ export const getMenuPaths = (menus: RouteRecordRaw[]): string[] => {
 };
 
 /**
- * 会员中心和后台的菜单处理
+ * 菜单处理
  */
 const handleMenuRule = (routes: any, pathPrefix = '/', type = ['menu', 'menu_dir']) => {
     const menuRule: RouteRecordRaw[] = [];
@@ -185,30 +157,6 @@ const handleMenuRule = (routes: any, pathPrefix = '/', type = ['menu', 'menu_dir
         });
     }
     return menuRule;
-};
-
-/**
- * 处理权限节点
- * @param routes 路由数据
- * @param prefix 节点前缀
- * @returns 组装好的权限节点
- */
-const handleAuthNode = (routes: any, prefix = '/') => {
-    const authNode: Map<string, string[]> = new Map([]);
-    assembleAuthNode(routes, authNode, prefix, prefix);
-    return authNode;
-};
-const assembleAuthNode = (routes: any, authNode: Map<string, string[]>, prefix = '/', parent = '/') => {
-    const authNodeTemp = [];
-    for (const key in routes) {
-        if (routes[key].type == 'button') authNodeTemp.push(prefix + routes[key].name);
-        if (routes[key].children && routes[key].children.length > 0) {
-            assembleAuthNode(routes[key].children, authNode, prefix, prefix + routes[key].name);
-        }
-    }
-    if (authNodeTemp && authNodeTemp.length > 0) {
-        authNode.set(parent, authNodeTemp);
-    }
 };
 
 /**
