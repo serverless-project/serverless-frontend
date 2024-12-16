@@ -1,19 +1,14 @@
 <script setup lang="ts">
-import { useTemplateRefsList, useTransition } from '@vueuse/core';
+import { useTransition } from '@vueuse/core';
 import { ComputedRef, CSSProperties, onActivated, onBeforeMount, onMounted, onUnmounted, Ref, ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { useNavTabs } from '/@/stores/navTabs';
 import Icon from '/@/components/icon/index.vue';
-
-let workTimer: number;
 
 defineOptions({
   name: 'dashboard',
 });
 
-const { t } = useI18n();
 const navTabs = useNavTabs();
-const chartRefs = useTemplateRefsList<HTMLDivElement>();
 
 const statisticValueStyle: CSSProperties = {
   fontSize: '28px',
@@ -27,9 +22,7 @@ onMounted(() => {
 
 onBeforeMount(() => {});
 
-onUnmounted(() => {
-  clearInterval(workTimer);
-});
+onUnmounted(() => {});
 
 watch(
   () => navTabs.state.tabFullScreen,
@@ -109,6 +102,7 @@ const initCountUp = () => {
 
 <template>
   <div class="default-main">
+    <!-- 应用看板 -->
     <div class="small-panel-box">
       <el-row :gutter="20">
         <el-col :sm="12" :lg="6" v-for="(panel, $index) in panelsRef" :key="$index">
@@ -125,7 +119,7 @@ const initCountUp = () => {
         </el-col>
       </el-row>
     </div>
-
+    <!-- 应用列表 -->
 
   </div>
 </template>
