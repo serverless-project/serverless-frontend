@@ -31,6 +31,7 @@ import Contextmenu from '/@/components/contextmenu/index.vue';
 import horizontalScroll from '/@/utils/horizontalScroll';
 import { getFirstRoute, routePush } from '/@/utils/router';
 import { homeBaseRoutePath } from '/@/router/static/homeBase';
+import Icon from "/@/components/icon/index.vue";
 
 const route = useRoute();
 const router = useRouter();

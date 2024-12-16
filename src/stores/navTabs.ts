@@ -1,12 +1,12 @@
-import { isEmpty } from 'lodash-es'
-import { defineStore } from 'pinia'
-import { reactive } from 'vue'
-import type { RouteLocationNormalized, RouteRecordRaw } from 'vue-router'
-import { i18n } from '../lang'
-import {homeBaseRoutePath} from "/@/router/static/homeBase";
-import { STORE_TAB_VIEW_CONFIG } from '/@/stores/constant/cacheKey'
-import type { NavTabs } from '/@/stores/interface/index'
-import { layoutNavTabsRef } from '/@/stores/refs'
+import { isEmpty } from 'lodash-es';
+import { defineStore } from 'pinia';
+import { reactive } from 'vue';
+import type { RouteLocationNormalized, RouteRecordRaw } from 'vue-router';
+import { i18n } from '../lang';
+import { homeBaseRoutePath } from '/@/router/static/homeBase';
+import { STORE_TAB_VIEW_CONFIG } from '/@/stores/constant/cacheKey';
+import type { NavTabs } from '/@/stores/interface';
+import { layoutNavTabsRef } from '/@/stores/refs';
 
 export const useNavTabs = defineStore(
     'navTabs',
@@ -18,23 +18,23 @@ export const useNavTabs = defineStore(
             tabFullScreen: false,
             tabsViewRoutes: [],
             authNode: new Map(),
-        })
+        });
 
         /**
          * 通过路由路径关闭tab
          * @param fullPath 需要关闭的 tab 的路径
          */
         const closeTabByPath = (fullPath: string) => {
-            layoutNavTabsRef.value?.closeTabByPath(fullPath)
-        }
+            layoutNavTabsRef.value?.closeTabByPath(fullPath);
+        };
 
         /**
          * 关闭所有tab
          * @param menu 需要保留的标签，否则关闭全部标签并打开第一个路由
          */
         const closeAllTab = (menu?: RouteLocationNormalized) => {
-            layoutNavTabsRef.value?.closeAllTab(menu)
-        }
+            layoutNavTabsRef.value?.closeAllTab(menu);
+        };
 
         /**
          * 修改 tab 标题
@@ -42,38 +42,39 @@ export const useNavTabs = defineStore(
          * @param title 新的标题
          */
         const updateTabTitle = (fullPath: string, title: string) => {
-            layoutNavTabsRef.value?.updateTabTitle(fullPath, title)
-        }
+            layoutNavTabsRef.value?.updateTabTitle(fullPath, title);
+        };
 
         /**
          * 添加 tab（内部）
          * ps: router.push 时可自动完成 tab 添加，无需调用此方法
          */
         function _addTab(route: RouteLocationNormalized) {
-            const tabView = { ...route, matched: [], meta: { ...route.meta } }
-            if (!tabView.meta.addtab) return
+            const tabView = { ...route, matched: [], meta: { ...route.meta } };
+
+            if (!tabView.meta.addtab) return;
 
             // 通过路由寻找菜单的原始数据
-            const tabViewRoute = getTabsViewDataByRoute(tabView)
+            const tabViewRoute = getTabsViewDataByRoute(tabView);
             if (tabViewRoute && tabViewRoute.meta) {
-                tabView.name = tabViewRoute.name
-                tabView.meta.id = tabViewRoute.meta.id
-                tabView.meta.title = tabViewRoute.meta.title
+                tabView.name = tabViewRoute.name;
+                tabView.meta.id = tabViewRoute.meta.id;
+                tabView.meta.title = tabViewRoute.meta.title;
             }
 
             for (const key in state.tabsView) {
                 // 菜单已在 tabs 存在，更新 params 和 query
                 if (state.tabsView[key].meta.id === tabView.meta.id || state.tabsView[key].fullPath == tabView.fullPath) {
-                    state.tabsView[key].fullPath = tabView.fullPath
-                    state.tabsView[key].params = !isEmpty(tabView.params) ? tabView.params : state.tabsView[key].params
-                    state.tabsView[key].query = !isEmpty(tabView.query) ? tabView.query : state.tabsView[key].query
-                    return
+                    state.tabsView[key].fullPath = tabView.fullPath;
+                    state.tabsView[key].params = !isEmpty(tabView.params) ? tabView.params : state.tabsView[key].params;
+                    state.tabsView[key].query = !isEmpty(tabView.query) ? tabView.query : state.tabsView[key].query;
+                    return;
                 }
             }
             if (typeof tabView.meta.title == 'string') {
-                tabView.meta.title = i18n.global.te(tabView.meta.title) ? i18n.global.t(tabView.meta.title) : tabView.meta.title
+                tabView.meta.title = i18n.global.te(tabView.meta.title) ? i18n.global.t(tabView.meta.title) : tabView.meta.title;
             }
-            state.tabsView.push(tabView)
+            state.tabsView.push(tabView);
         }
 
         /**
@@ -82,12 +83,12 @@ export const useNavTabs = defineStore(
          */
         const _setActiveRoute = (route: RouteLocationNormalized): void => {
             const currentRouteIndex: number = state.tabsView.findIndex((item: RouteLocationNormalized) => {
-                return item.fullPath === route.fullPath
-            })
-            if (currentRouteIndex === -1) return
-            state.activeRoute = route
-            state.activeIndex = currentRouteIndex
-        }
+                return item.fullPath === route.fullPath;
+            });
+            if (currentRouteIndex === -1) return;
+            state.activeRoute = route;
+            state.activeIndex = currentRouteIndex;
+        };
 
         /**
          * 关闭 tab（内部）
@@ -96,10 +97,10 @@ export const useNavTabs = defineStore(
         function _closeTab(route: RouteLocationNormalized) {
             state.tabsView.map((v, k) => {
                 if (v.fullPath == route.fullPath) {
-                    state.tabsView.splice(k, 1)
-                    return
+                    state.tabsView.splice(k, 1);
+                    return;
                 }
-            })
+            });
         }
 
         /**
@@ -108,11 +109,11 @@ export const useNavTabs = defineStore(
          */
         const _closeTabs = (retainMenu: RouteLocationNormalized | false = false) => {
             if (retainMenu) {
-                state.tabsView = [retainMenu]
+                state.tabsView = [retainMenu];
             } else {
-                state.tabsView = []
+                state.tabsView = [];
             }
-        }
+        };
 
         /**
          * 更新标签标题（内部）
@@ -121,40 +122,40 @@ export const useNavTabs = defineStore(
         const _updateTabTitle = (fullPath: string, title: string) => {
             for (const key in state.tabsView) {
                 if (state.tabsView[key].fullPath == fullPath) {
-                    state.tabsView[key].meta.title = title
-                    break
+                    state.tabsView[key].meta.title = title;
+                    break;
                 }
             }
-        }
+        };
 
         /**
          * 设置从后台加载到的菜单路由列表
          */
         const setTabsViewRoutes = (data: RouteRecordRaw[]): void => {
-            state.tabsViewRoutes = encodeRoutesURI(data)
-        }
+            state.tabsViewRoutes = encodeRoutesURI(data);
+        };
 
         /**
          * 以key设置权限节点
          */
         const setAuthNode = (key: string, data: string[]) => {
-            state.authNode.set(key, data)
-        }
+            state.authNode.set(key, data);
+        };
 
         /**
          * 覆盖设置权限节点
          */
         const fillAuthNode = (data: Map<string, string[]>) => {
-            state.authNode = data
-        }
+            state.authNode = data;
+        };
 
         /**
          * 设置当前 tab 是否全屏
          * @param status 全屏状态
          */
         const setFullScreen = (status: boolean): void => {
-            state.tabFullScreen = status
-        }
+            state.tabFullScreen = status;
+        };
 
         /**
          * 寻找路由在菜单中的数据
@@ -163,21 +164,21 @@ export const useNavTabs = defineStore(
          */
         const getTabsViewDataByRoute = (route: RouteLocationNormalized, returnType: 'normal' | 'above' = 'normal'): RouteRecordRaw | false => {
             // 以完整路径寻找
-            let found = getTabsViewDataByPath(route.fullPath, state.tabsViewRoutes, returnType)
+            let found = getTabsViewDataByPath(route.fullPath, state.tabsViewRoutes, returnType);
             if (found) {
-                found.meta!.matched = route.fullPath
-                return found
+                found.meta!.matched = route.fullPath;
+                return found;
             }
 
             // 以路径寻找
-            found = getTabsViewDataByPath(route.path, state.tabsViewRoutes, returnType)
+            found = getTabsViewDataByPath(route.path, state.tabsViewRoutes, returnType);
             if (found) {
-                found.meta!.matched = route.path
-                return found
+                found.meta!.matched = route.path;
+                return found;
             }
 
-            return false
-        }
+            return false;
+        };
 
         /**
          * 递归的寻找路由路径在菜单中的数据
@@ -189,18 +190,18 @@ export const useNavTabs = defineStore(
             for (const key in menus) {
                 // 找到目标
                 if (menus[key].path === path) {
-                    return menus[key]
+                    return menus[key];
                 }
                 // 从子级继续寻找
-                if (menus[key].children && menus[key].children.length) {
-                    const find = getTabsViewDataByPath(path, menus[key].children, returnType)
+                if (menus[key].children && menus[key].children?.length) {
+                    const find = getTabsViewDataByPath(path, menus[key].children as RouteRecordRaw[], returnType);
                     if (find) {
-                        return returnType == 'above' ? menus[key] : find
+                        return returnType == 'above' ? menus[key] : find;
                     }
                 }
             }
-            return false
-        }
+            return false;
+        };
 
         return {
             state,
@@ -218,7 +219,7 @@ export const useNavTabs = defineStore(
             _closeTabs,
             _setActiveRoute,
             _updateTabTitle,
-        }
+        };
     },
     {
         persist: {
@@ -226,7 +227,7 @@ export const useNavTabs = defineStore(
             pick: ['state.tabFullScreen'],
         },
     }
-)
+);
 
 /**
  * 对iframe的url进行编码
@@ -234,12 +235,12 @@ export const useNavTabs = defineStore(
 function encodeRoutesURI(data: RouteRecordRaw[]) {
     data.forEach((item) => {
         if (item.meta?.menu_type == 'iframe') {
-            item.path = homeBaseRoutePath + '/iframe/' + encodeURIComponent(item.path)
+            item.path = homeBaseRoutePath + '/iframe/' + encodeURIComponent(item.path);
         }
 
         if (item.children && item.children.length) {
-            item.children = encodeRoutesURI(item.children)
+            item.children = encodeRoutesURI(item.children);
         }
-    })
-    return data
+    });
+    return data;
 }

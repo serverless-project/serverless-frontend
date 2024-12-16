@@ -9,6 +9,7 @@ export const useUserInfo = defineStore('userInfo', {
             username: '',
             nickname: '',
             avatar: '',
+            last_login_time: '',
         };
     },
     actions: {

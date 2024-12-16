@@ -5,11 +5,11 @@ import { CSSProperties, nextTick, onActivated, onBeforeMount, onMounted, onUnmou
 import { useI18n } from 'vue-i18n';
 import coffeeSvg from '/@/assets/dashboard/coffee.svg';
 import headerSvg from '/@/assets/dashboard/header-1.svg';
-import { useAdminInfo } from '/@/stores/adminInfo';
 import { WORKING_TIME } from '/@/stores/constant/cacheKey';
 import { useNavTabs } from '/@/stores/navTabs';
 import { fullUrl, getGreet } from '/@/utils/common';
 import { Local } from '/@/utils/storage';
+import {useUserInfo} from "/@/stores/userInfo";
 
 let workTimer: number;
 
@@ -20,7 +20,7 @@ defineOptions({
 const d = new Date();
 const { t } = useI18n();
 const navTabs = useNavTabs();
-const adminInfo = useAdminInfo();
+const userInfo = useUserInfo();
 const chartRefs = useTemplateRefsList<HTMLDivElement>();
 
 const state: {
@@ -489,7 +489,7 @@ watch(
           <div class="welcome suspension">
             <img class="welcome-img" :src="headerSvg" alt="" />
             <div class="welcome-text">
-              <div class="welcome-title">{{ adminInfo.nickname + t('utils.comma') + getGreet() }}</div>
+              <div class="welcome-title">{{ userInfo.nickname + t('utils.comma') + getGreet() }}</div>
               <div class="welcome-note">{{ state.remark }}</div>
             </div>
           </div>

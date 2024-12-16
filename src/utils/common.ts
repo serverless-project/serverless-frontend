@@ -3,8 +3,6 @@ import { nextTick } from 'vue';
 import * as elIcons from '@element-plus/icons-vue';
 import router from '/@/router/index';
 import Icon from '/@/components/icon/index.vue';
-import { useNavTabs } from '/@/stores/navTabs';
-import { useMemberCenter } from '/@/stores/memberCenter';
 import type { FormInstance } from 'element-plus';
 import { useSiteConfig } from '../stores/siteConfig';
 import { useTitle } from '@vueuse/core';
@@ -195,22 +193,22 @@ export function auth(node: { name: string; subNodeName?: string }): boolean;
  * @param node
  */
 export function auth(node: string | { name: string; subNodeName?: string }) {
-    const store = isAdminApp() ? useNavTabs() : useMemberCenter();
-    if (typeof node === 'string') {
-        const path = getCurrentRoutePath();
-        if (store.state.authNode.has(path)) {
-            const subNodeName = path + (path == '/' ? '' : '/') + node;
-            if (store.state.authNode.get(path)!.some((v: string) => v == subNodeName)) {
-                return true;
-            }
-        }
-    } else {
-        // 节点列表中没有找到 name
-        if (!node.name || !store.state.authNode.has(node.name)) return false;
-
-        // 无需继续检查子节点或未找到子节点
-        if (!node.subNodeName || store.state.authNode.get(node.name)?.includes(node.subNodeName)) return true;
-    }
+    // const store = isAdminApp() ? useNavTabs() : useMemberCenter();
+    // if (typeof node === 'string') {
+    //     const path = getCurrentRoutePath();
+    //     if (store.state.authNode.has(path)) {
+    //         const subNodeName = path + (path == '/' ? '' : '/') + node;
+    //         if (store.state.authNode.get(path)!.some((v: string) => v == subNodeName)) {
+    //             return true;
+    //         }
+    //     }
+    // } else {
+    //     // 节点列表中没有找到 name
+    //     if (!node.name || !store.state.authNode.has(node.name)) return false;
+    //
+    //     // 无需继续检查子节点或未找到子节点
+    //     if (!node.subNodeName || store.state.authNode.get(node.name)?.includes(node.subNodeName)) return true;
+    // }
     return false;
 }
 
@@ -224,6 +222,7 @@ export const fullUrl = (relativeUrl: string, domain = '') => {
     if (!domain) {
         domain = siteConfig.cdnUrl ? siteConfig.cdnUrl : getUrl();
     }
+    console.log(getUrl())
     if (!relativeUrl) return domain;
 
     const regUrl = new RegExp(/^http(s)?:\/\//);

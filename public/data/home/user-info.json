@@ -2,5 +2,6 @@
     "id": 0,
     "username": "admin",
     "nickname": "Admin",
-    "avatar": "/public/images/avatar.png"
+    "avatar": "/images/avatar.png",
+    "last_login_time": "2024-12-16 14:26:49"
 }

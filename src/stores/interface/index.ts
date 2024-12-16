@@ -99,6 +99,7 @@ export interface UserInfo {
     username: string
     nickname: string
     avatar: string
+    last_login_time: string
 }
 
 export interface AdminInfo {

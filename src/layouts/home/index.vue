@@ -15,7 +15,7 @@ import { setNavTabsWidth } from '/@/utils/layout';
 import { getFirstRoute, handleHomeRoute, routePush } from '/@/utils/router';
 import { getRoutes, getSiteConfig, getUserInfo, index } from '/@/api/home';
 import { useSiteConfig } from '/@/stores/siteConfig';
-import type { SiteConfig } from '/@/stores/interface';
+import type {SiteConfig, UserInfo} from '/@/stores/interface';
 import { useUserInfo } from '/@/stores/userInfo';
 
 // const terminal = useTerminal();
@@ -43,7 +43,7 @@ const init = async () => {
   const res = {
     routes: (await getRoutes()).data,
     siteConfig: (await getSiteConfig()).data as SiteConfig,
-    userInfo: (await getUserInfo()).data,
+    userInfo: (await getUserInfo()).data as UserInfo,
   };
 
   // 初始化网页配置
