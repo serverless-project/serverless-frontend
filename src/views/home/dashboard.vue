@@ -188,7 +188,7 @@ provide('baTable', baTable);
       <TableHeader
         style="outline: none"
         :buttons="['refresh', 'add', 'edit', 'delete', 'comSearch', 'quickSearch', 'columnDisplay']"
-        :quick-search-placeholder="t('Quick search placeholder', { fields: t('user.user.User name') + '/' + t('user.user.nickname') })"
+        quick-search-placeholder="根据应用名称进行搜索"
       />
 
       <!-- 表格 -->

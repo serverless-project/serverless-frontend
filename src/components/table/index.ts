@@ -99,7 +99,22 @@ export const appOptButtons = (): OptButton[] => {
             class: 'table-opt-button',
             disabledTip: false,
         },
-
+        {
+            render: 'confirmButton',
+            name: 'delete',
+            title: 'Delete',
+            text: '',
+            type: 'text',
+            icon: 'fa fa-trash',
+            class: 'table-opt-button',
+            popconfirm: {
+                confirmButtonText: i18n.global.t('Delete'),
+                cancelButtonText: i18n.global.t('Cancel'),
+                confirmButtonType: 'danger',
+                title: '确认要删除当前应用吗？',
+            },
+            disabledTip: false,
+        },
 
     ];
 };
