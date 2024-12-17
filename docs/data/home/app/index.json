@@ -4,7 +4,7 @@
             "id": 1,
             "name": "应用1",
             "desc": "这是第一个被部署的应用",
-            "status": "asdfasd"
+            "status": "运行中"
         }
     ]
 }

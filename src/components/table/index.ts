@@ -1,5 +1,5 @@
-import { TableColumnCtx } from "element-plus";
-import { i18n } from "/@/lang";
+import {TableColumnCtx} from "element-plus";
+import {i18n} from "/@/lang";
 
 /**
  * 获取单元格值
@@ -51,6 +51,46 @@ export const appOptButtons = (): OptButton[] => {
         },
         {
             render: 'tipButton',
+            name: 'build',
+            title: '构建',
+            text: '',
+            type: 'text',
+            icon: 'fa fa-wrench',
+            class: 'table-opt-button',
+            disabledTip: false,
+        },
+        {
+            render: 'tipButton',
+            name: 'deploy',
+            title: '部署',
+            text: '',
+            type: 'text',
+            icon: 'fa fa-cloud-upload',
+            class: 'table-opt-button',
+            disabledTip: false,
+        },
+        {
+            render: 'tipButton',
+            name: 'invoke',
+            title: '调用',
+            text: '',
+            type: 'text',
+            icon: 'fa fa-paper-plane',
+            class: 'table-opt-button',
+            disabledTip: false,
+        },
+        {
+            render: 'tipButton',
+            name: 'dag',
+            title: 'DAG',
+            text: '',
+            type: 'text',
+            icon: 'fa fa-share-alt',
+            class: 'table-opt-button',
+            disabledTip: false,
+        },
+        {
+            render: 'tipButton',
             name: 'status',
             title: '容器状态',
             text: '',
@@ -59,6 +99,8 @@ export const appOptButtons = (): OptButton[] => {
             class: 'table-opt-button',
             disabledTip: false,
         },
+
+
     ];
 };
 

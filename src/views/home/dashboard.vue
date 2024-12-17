@@ -133,7 +133,7 @@ const baTable = new baTableClass(new baTableApi('/data/home/app/'), {
       render: 'tag',
       custom: { stop: 'danger', running: 'success', starting: 'warning' },
       replaceValue: { stop: '已终止', running: '运行中', starting: '启动中' },
-      width: 70,
+      width: 80,
     },
     {
       label: '操作',
@@ -153,7 +153,7 @@ const baTable = new baTableClass(new baTableApi('/data/home/app/'), {
       width: 160,
     },
   ],
-  dblClickNotEditColumn: [undefined],
+  dblClickNotEditColumn: ['id', 'name','status', undefined, 'create_time'],
 });
 
 baTable.mount();
