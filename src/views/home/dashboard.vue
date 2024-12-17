@@ -3,7 +3,7 @@ import { useTransition } from '@vueuse/core';
 import { ComputedRef, CSSProperties, onActivated, onBeforeMount, onMounted, onUnmounted, provide, Ref, ref, watch } from 'vue';
 import { useNavTabs } from '/@/stores/navTabs';
 import Icon from '/@/components/icon/index.vue';
-import { defaultOptButtons } from '/@/components/table/index';
+import {appOptButtons, defaultOptButtons} from '/@/components/table/index';
 import { useI18n } from 'vue-i18n';
 import { baTableApi } from '/@/api/common';
 import baTableClass from '/@/utils/baTable';
@@ -140,7 +140,7 @@ const baTable = new baTableClass(new baTableApi('/data/home/app/'), {
       align: 'left',
       width: 300,
       render: 'buttons',
-      buttons: defaultOptButtons(['edit', 'delete']),
+      buttons: appOptButtons(),
       operator: false,
     },
     {

@@ -37,6 +37,32 @@ export const getCellValue = (row: TableRow, field: TableColumn, column: TableCol
     return cellValue
 }
 
+export const appOptButtons = (): OptButton[] => {
+    return [
+        {
+            render: 'tipButton',
+            name: 'edit',
+            title: 'Edit',
+            text: '',
+            type: 'text',
+            icon: 'fa fa-pencil',
+            class: 'table-row-edit',
+            disabledTip: false,
+        },
+        {
+            render: 'tipButton',
+            name: 'status',
+            title: '容器状态',
+            text: '',
+            type: 'text',
+            icon: 'fa-brands fa-docker',
+            class: 'table-row-edit',
+            disabledTip: false,
+        },
+
+    ]
+}
+
 /*
  * 默认按钮组
  */
