@@ -15,6 +15,9 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
+    if (to.path.startsWith('/api')) {
+        return;
+    }
     NProgress.configure({ showSpinner: false });
     NProgress.start();
     if (!window.existLoading) {

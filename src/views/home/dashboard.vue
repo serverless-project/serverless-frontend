@@ -1,13 +1,21 @@
 <script setup lang="ts">
 import { useTransition } from '@vueuse/core';
-import { ComputedRef, CSSProperties, onActivated, onBeforeMount, onMounted, onUnmounted, Ref, ref, watch } from 'vue';
+import { ComputedRef, CSSProperties, onActivated, onBeforeMount, onMounted, onUnmounted, provide, Ref, ref, watch } from 'vue';
 import { useNavTabs } from '/@/stores/navTabs';
 import Icon from '/@/components/icon/index.vue';
+import { defaultOptButtons } from '/@/components/table/index';
+import { useI18n } from 'vue-i18n';
+import { baTableApi } from '/@/api/common';
+import baTableClass from '/@/utils/baTable';
+import PopupForm from '/@/views/home/popupForm.vue';
+import TableHeader from '/@/components/table/header/index.vue';
+import Table from '/@/components/table/index.vue';
 
 defineOptions({
   name: 'dashboard',
 });
 
+const { t } = useI18n();
 const navTabs = useNavTabs();
 
 const statisticValueStyle: CSSProperties = {
@@ -98,6 +106,60 @@ const initCountUp = () => {
     panelsRef.value[i].number = mockNumbers[i];
   }
 };
+
+const baTable = new baTableClass(new baTableApi('/api/app/'), {
+  column: [
+    { type: 'selection', align: 'center', operator: false },
+    { label: 'ID', prop: 'id', align: 'left', operator: '=', operatorPlaceholder: 'ID', width: 70 },
+    {
+      label: '应用名称',
+      prop: 'name',
+      align: 'left',
+      operator: 'LIKE',
+      operatorPlaceholder: t('Fuzzy query'),
+      width: 150,
+    },
+    {
+      label: '描述',
+      prop: 'desc',
+      align: 'left',
+      operator: 'LIKE',
+      operatorPlaceholder: t('Fuzzy query'),
+    },
+    {
+      label: t('State'),
+      prop: 'status',
+      align: 'left',
+      render: 'tag',
+      custom: { stop: 'danger', running: 'success', starting: 'warning' },
+      replaceValue: { stop: '已终止', running: '运行中', starting: '启动中' },
+      width: 70,
+    },
+    {
+      label: '操作',
+      align: 'left',
+      width: 300,
+      render: 'buttons',
+      buttons: defaultOptButtons(['edit', 'delete']),
+      operator: false,
+    },
+    {
+      label: t('Create time'),
+      prop: 'create_time',
+      align: 'left',
+      render: 'datetime',
+      sortable: 'custom',
+      operator: 'RANGE',
+      width: 160,
+    },
+  ],
+  dblClickNotEditColumn: [undefined],
+});
+
+baTable.mount();
+baTable.getIndex();
+
+provide('baTable', baTable);
 </script>
 
 <template>
@@ -120,7 +182,22 @@ const initCountUp = () => {
       </el-row>
     </div>
     <!-- 应用列表 -->
+    <div class="default-main ba-table-box" style="margin: 0">
+      <el-alert class="ba-table-alert" v-if="baTable.table.remark" :title="baTable.table.remark" type="info" show-icon />
+      <!-- 表格顶部菜单 -->
+      <TableHeader
+        style="outline: none"
+        :buttons="['refresh', 'add', 'edit', 'delete', 'comSearch', 'quickSearch', 'columnDisplay']"
+        :quick-search-placeholder="t('Quick search placeholder', { fields: t('user.user.User name') + '/' + t('user.user.nickname') })"
+      />
 
+      <!-- 表格 -->
+      <!-- 要使用`el-table`组件原有的属性，直接加在Table标签上即可 -->
+      <Table ref="tableRef" />
+
+      <!-- 表单 -->
+      <PopupForm />
+    </div>
   </div>
 </template>
 

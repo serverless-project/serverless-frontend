@@ -1,30 +1,30 @@
 interface Window {
-    existLoading: boolean
-    lazy: number
-    unique: number
-    tokenRefreshing: boolean
-    requests: Function[]
-    eventSource: EventSource
-    loadLangHandle: Record<string, any>
+    existLoading: boolean;
+    lazy: number;
+    unique: number;
+    tokenRefreshing: boolean;
+    requests: Function[];
+    eventSource: EventSource;
+    loadLangHandle: Record<string, any>;
 }
 
 interface anyObj {
-    [key: string]: any
+    [key: string]: any;
 }
 
 interface TableDefaultData<T = any> {
-    list: T
-    remark: string
-    total: number
+    list: T;
+    remark: string;
+    total: number;
 }
 
 interface ApiResponse<T = any> {
-    code: number
-    data: T
-    msg: string
-    time: number
+    code: number;
+    data: T;
+    msg: string;
+    time: number;
 }
 
-type ApiPromise<T = any> = Promise<ApiResponse<T>>
+type ApiPromise<T = any> = Promise<ApiResponse<T>>;
 
-type Writeable<T> = { -readonly [P in keyof T]: T[P] }
+type Writeable<T> = { -readonly [P in keyof T]: T[P] };

@@ -1,5 +1,5 @@
 import { TableColumnCtx } from 'element-plus'
-import { i18n } from '/@/lang/index'
+import { i18n } from '/@/lang'
 
 /**
  * 获取单元格值

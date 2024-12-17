@@ -209,7 +209,7 @@ export function auth(node: string | { name: string; subNodeName?: string }) {
     //     // 无需继续检查子节点或未找到子节点
     //     if (!node.subNodeName || store.state.authNode.get(node.name)?.includes(node.subNodeName)) return true;
     // }
-    return false;
+    return true;
 }
 
 /**
@@ -222,7 +222,7 @@ export const fullUrl = (relativeUrl: string, domain = '') => {
     if (!domain) {
         domain = siteConfig.cdnUrl ? siteConfig.cdnUrl : getUrl();
     }
-    console.log(getUrl())
+    console.log(getUrl());
     if (!relativeUrl) return domain;
 
     const regUrl = new RegExp(/^http(s)?:\/\//);
