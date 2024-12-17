@@ -3,7 +3,7 @@ import { useTransition } from '@vueuse/core';
 import { ComputedRef, CSSProperties, onActivated, onBeforeMount, onMounted, onUnmounted, provide, Ref, ref, watch } from 'vue';
 import { useNavTabs } from '/@/stores/navTabs';
 import Icon from '/@/components/icon/index.vue';
-import {appOptButtons, defaultOptButtons} from '/@/components/table/index';
+import { appOptButtons } from '/@/components/table/index';
 import { useI18n } from 'vue-i18n';
 import { baTableApi } from '/@/api/common';
 import baTableClass from '/@/utils/baTable';
@@ -202,6 +202,10 @@ provide('baTable', baTable);
 </template>
 
 <style scoped lang="scss">
+.table-opt-button .icon {
+  color: #8595F4 !important;
+}
+
 .welcome {
   background: #e1eaf9;
   border-radius: 6px;

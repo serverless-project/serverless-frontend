@@ -1,41 +1,41 @@
-import { TableColumnCtx } from 'element-plus'
-import { i18n } from '/@/lang'
+import { TableColumnCtx } from "element-plus";
+import { i18n } from "/@/lang";
 
 /**
  * 获取单元格值
  */
 export const getCellValue = (row: TableRow, field: TableColumn, column: TableColumnCtx<TableRow>, index: number) => {
-    if (!field.prop) return ''
+    if (!field.prop) return '';
 
-    const prop = field.prop
-    let cellValue: any = row[prop]
+    const prop = field.prop;
+    let cellValue: any = row[prop];
 
     // 字段 prop 带 . 比如 user.nickname
     if (prop.indexOf('.') > -1) {
-        const fieldNameArr = prop.split('.')
-        cellValue = row[fieldNameArr[0]]
+        const fieldNameArr = prop.split('.');
+        cellValue = row[fieldNameArr[0]];
         for (let index = 1; index < fieldNameArr.length; index++) {
-            cellValue = cellValue ? cellValue[fieldNameArr[index]] ?? '' : ''
+            cellValue = cellValue ? cellValue[fieldNameArr[index]] ?? '' : '';
         }
-        return cellValue
+        return cellValue;
     }
 
     // 若无值，尝试取默认值
     if (cellValue === undefined || cellValue === null) {
-        cellValue = field.default
+        cellValue = field.default;
     }
 
     // 渲染前格式化
     if (field.renderFormatter && typeof field.renderFormatter == 'function') {
-        cellValue = field.renderFormatter(row, field, cellValue, column, index)
-        console.warn('baTable.table.column.renderFormatter 即将废弃，请直接使用兼容 el-table 的 baTable.table.column.formatter 代替')
+        cellValue = field.renderFormatter(row, field, cellValue, column, index);
+        console.warn('baTable.table.column.renderFormatter 即将废弃，请直接使用兼容 el-table 的 baTable.table.column.formatter 代替');
     }
     if (field.formatter && typeof field.formatter == 'function') {
-        cellValue = field.formatter(row, column, cellValue, index)
+        cellValue = field.formatter(row, column, cellValue, index);
     }
 
-    return cellValue
-}
+    return cellValue;
+};
 
 export const appOptButtons = (): OptButton[] => {
     return [
@@ -45,8 +45,8 @@ export const appOptButtons = (): OptButton[] => {
             title: 'Edit',
             text: '',
             type: 'text',
-            icon: 'fa fa-pencil',
-            class: 'table-row-edit',
+            icon: 'fa fa-code',
+            class: 'table-opt-button',
             disabledTip: false,
         },
         {
@@ -55,13 +55,12 @@ export const appOptButtons = (): OptButton[] => {
             title: '容器状态',
             text: '',
             type: 'text',
-            icon: 'fa-brands fa-docker',
-            class: 'table-row-edit',
+            icon: 'fa fa-cube',
+            class: 'table-opt-button',
             disabledTip: false,
         },
-
-    ]
-}
+    ];
+};
 
 /*
  * 默认按钮组
@@ -113,16 +112,16 @@ export const defaultOptButtons = (optButType: DefaultOptButType[] = ['weigh-sort
                 disabledTip: false,
             },
         ],
-    ])
+    ]);
 
-    const optButtons: OptButton[] = []
+    const optButtons: OptButton[] = [];
     for (const key in optButType) {
         if (optButtonsPre.has(optButType[key])) {
-            optButtons.push(optButtonsPre.get(optButType[key])!)
+            optButtons.push(optButtonsPre.get(optButType[key])!);
         }
     }
-    return optButtons
-}
+    return optButtons;
+};
 
 /**
  * 将带children的数组降维，然后寻找index所在的行
@@ -130,22 +129,22 @@ export const defaultOptButtons = (optButType: DefaultOptButType[] = ['weigh-sort
 export const findIndexRow = (data: TableRow[], findIdx: number, keyIndex: number | TableRow = -1): number | TableRow => {
     for (const key in data) {
         if (typeof keyIndex == 'number') {
-            keyIndex++
+            keyIndex++;
         }
 
         if (keyIndex == findIdx) {
-            return data[key]
+            return data[key];
         }
 
         if (data[key].children) {
-            keyIndex = findIndexRow(data[key].children!, findIdx, keyIndex)
+            keyIndex = findIndexRow(data[key].children!, findIdx, keyIndex);
             if (typeof keyIndex != 'number') {
-                return keyIndex
+                return keyIndex;
             }
         }
     }
 
-    return keyIndex
-}
+    return keyIndex;
+};
 
-type DefaultOptButType = 'weigh-sort' | 'edit' | 'delete'
+type DefaultOptButType = 'weigh-sort' | 'edit' | 'delete';
