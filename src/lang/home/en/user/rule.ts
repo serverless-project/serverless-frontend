@@ -18,7 +18,7 @@ export default {
     'no_login_valid 1': 'yes',
     'no_login_valid tips': 'Tourists do not have membership groups Use this option to set whether the current rules are valid for tourists (visible)',
     'For example, if you add account/overview as a route only':
-        'Please start with /src for web side component paths, such as: /src/views/frontend/index.vue',
+        'Please start with /src for web side component paths, such as: /src/views/frontend/index.json.vue',
     'Web side component path, please start with /src, such as: /src/views/frontend/index':
         "For example, if you add 'account/overview' as a route only, then you can additionally add 'account/overview', 'account/overview/:a' and 'account/overview/:b/:C' as menus only.",
 }

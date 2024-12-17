@@ -17,7 +17,7 @@ export class baTableApi {
     constructor(controllerUrl: string) {
         this.controllerUrl = controllerUrl
         this.actionUrl = new Map([
-            ['index', controllerUrl + 'index'],
+            ['index', controllerUrl + 'index.json'],
             ['add', controllerUrl + 'add'],
             ['edit', controllerUrl + 'edit'],
             ['del', controllerUrl + 'del'],

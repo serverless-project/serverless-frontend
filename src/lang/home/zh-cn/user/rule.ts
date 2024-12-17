@@ -17,7 +17,7 @@ export default {
     'no_login_valid 0': '游客无效',
     'no_login_valid 1': '游客有效',
     'no_login_valid tips': '游客没有会员分组，通过本选项设置当前规则是否对游客有效（可见）',
-    'For example, if you add account/overview as a route only': 'web端组件路径，请以/src开头，如:/src/views/frontend/index.vue',
+    'For example, if you add account/overview as a route only': 'web端组件路径，请以/src开头，如:/src/views/frontend/index.json.vue',
     'Web side component path, please start with /src, such as: /src/views/frontend/index':
         '比如将`account/overview`只添加为路由，那么可以另外将`account/overview`、`account/overview/:a`、`account/overview/:b/:c`只添加为菜单',
 }

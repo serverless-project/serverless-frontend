@@ -107,7 +107,7 @@ const initCountUp = () => {
   }
 };
 
-const baTable = new baTableClass(new baTableApi('/api/app/'), {
+const baTable = new baTableClass(new baTableApi('/data/home/app/'), {
   column: [
     { type: 'selection', align: 'center', operator: false },
     { label: 'ID', prop: 'id', align: 'left', operator: '=', operatorPlaceholder: 'ID', width: 70 },

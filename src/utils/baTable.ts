@@ -109,6 +109,7 @@ export default class baTable {
             .index(this.table.filter)
             .then((res: any) => {
                 this.table.data = res.data.list;
+                console.log(res);
                 this.table.total = res.data.total;
                 this.table.remark = res.data.remark;
                 this.runAfter('getIndex', { res });

@@ -61,7 +61,7 @@ export interface Lang {
 }
 
 export interface NavTabs {
-    // 激活 tab 的 index
+    // 激活 tab 的 index.json
     activeIndex: number
     // 激活的 tab
     activeRoute: RouteLocationNormalized | null
