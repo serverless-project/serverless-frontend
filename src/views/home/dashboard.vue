@@ -131,8 +131,8 @@ const baTable = new baTableClass(new baTableApi('/data/home/app/'), {
       prop: 'status',
       align: 'left',
       render: 'tag',
-      custom: { stop: 'danger', running: 'success', starting: 'warning' },
-      replaceValue: { stop: '已终止', running: '运行中', starting: '启动中' },
+      custom: { stopped: 'danger', running: 'success', starting: 'warning' },
+      replaceValue: { stopped: '已终止', running: '运行中', starting: '启动中' },
       width: 80,
     },
     {

@@ -1,1 +1,0 @@
-import{_ as t}from"./index-ClHRNXuY.js";import{o as e,h as s}from"./vue-CBJ4XcuP.js";const o={};function r(c,n){return e(),s("span",null," testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest testtesttesttesttest ")}const f=t(o,[["render",r]]);export{f as default};
