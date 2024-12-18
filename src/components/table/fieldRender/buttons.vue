@@ -23,6 +23,7 @@
           :disabled="!(btn.title && !btn.disabledTip)"
           :content="getTranslation(btn.title)"
           placement="top"
+          :show-after="500"
         >
           <el-button
             v-blur
@@ -47,7 +48,7 @@
         >
           <template #reference>
             <div class="ml-6">
-              <el-tooltip :disabled="btn.title ? false : true" :content="getTranslation(btn.title)" placement="top">
+              <el-tooltip :disabled="btn.title ? false : true" :show-after="500" :content="getTranslation(btn.title)" placement="top">
                 <el-button
                   v-blur
                   :class="btn.class"
@@ -70,6 +71,7 @@
           :disabled="btn.title && !btn.disabledTip ? false : true"
           :content="getTranslation(btn.title)"
           placement="top"
+          :show-after="500"
         >
           <el-button
             :class="btn.class"
@@ -82,12 +84,14 @@
             <div v-if="btn.text" class="text">{{ getTranslation(btn.text) }}</div>
           </el-button>
         </el-tooltip>
+
         <!-- 带下拉菜单的按钮 -->
         <el-tooltip
           v-if="btn.render == 'dropdownButton'"
           :disabled="!(btn.title && !btn.disabledTip)"
           :content="getTranslation(btn.title)"
           placement="top"
+          :show-after="500"
         >
           <el-dropdown
             @command="
