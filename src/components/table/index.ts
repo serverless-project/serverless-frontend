@@ -88,6 +88,11 @@ export const appOptButtons = (): OptButton[] => {
             icon: 'fa fa-share-alt',
             class: 'table-opt-button',
             disabledTip: false,
+            click(row, field) {
+
+                console.log(row.id);
+                console.log(field);
+            },
         },
         {
             render: 'tipButton',

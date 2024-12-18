@@ -187,7 +187,7 @@ provide('baTable', baTable);
       <!-- 表格顶部菜单 -->
       <TableHeader
         style="outline: none"
-        :buttons="['refresh', 'add', 'edit', 'delete', 'comSearch', 'quickSearch', 'columnDisplay']"
+        :buttons="['refresh', 'add', 'delete', 'comSearch', 'quickSearch', 'columnDisplay']"
         quick-search-placeholder="根据应用名称进行搜索"
       />
 

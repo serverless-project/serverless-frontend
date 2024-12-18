@@ -125,6 +125,7 @@ import { computed, inject } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ComSearch from '/@/components/table/comSearch/index.vue';
 import type baTableClass from '/@/utils/baTable';
+import Icon from "/@/components/icon/index.vue";
 
 const { t } = useI18n();
 const baTable = inject('baTable') as baTableClass;

@@ -6,14 +6,13 @@
 import { onBeforeMount, onMounted, reactive } from 'vue';
 import { useConfig } from '/@/stores/config';
 import { useNavTabs } from '/@/stores/navTabs';
-import { useRoute } from 'vue-router';
 import Default from '/src/layouts/home/container/default.vue';
 import { Session } from '/@/utils/storage';
 import { useEventListener } from '@vueuse/core';
 import { BEFORE_RESIZE_LAYOUT } from '/@/stores/constant/cacheKey';
 import { setNavTabsWidth } from '/@/utils/layout';
 import { getFirstRoute, handleHomeRoute, routePush } from '/@/utils/router';
-import { getRoutes, getSiteConfig, getUserInfo, index } from '/@/api/home';
+import { getRoutes, getSiteConfig, getUserInfo } from '/@/api/home';
 import { useSiteConfig } from '/@/stores/siteConfig';
 import type {SiteConfig, UserInfo} from '/@/stores/interface';
 import { useUserInfo } from '/@/stores/userInfo';
