@@ -6,6 +6,24 @@
 >
 > 演示站：[example.kekwy.com](https://example.kekwy.com)
 
+## 快速开始
+
+```shell
+npm install
+```
+
+启动开发环境：
+
+```shell
+npm run dev
+```
+
+打包：
+
+```shell
+npm run build
+```
+
 ## Axios 配置
 
 修改 `src/utils/axios.ts` 文件中的方法 `createAxios`，如设置转发规则、API 前缀等：
