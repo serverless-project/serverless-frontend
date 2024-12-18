@@ -10,6 +10,7 @@ import baTableClass from '/@/utils/baTable';
 import PopupForm from '/@/views/home/popupForm.vue';
 import TableHeader from '/@/components/table/header/index.vue';
 import Table from '/@/components/table/index.vue';
+import ContainerStatusDialog from '/@/views/home/containerStatusDialog.vue';
 
 defineOptions({
   name: 'dashboard',
@@ -153,7 +154,7 @@ const baTable = new baTableClass(new baTableApi('/data/home/app/'), {
       width: 160,
     },
   ],
-  dblClickNotEditColumn: ['id', 'name','status', undefined, 'create_time'],
+  dblClickNotEditColumn: ['id', 'name', 'status', undefined, 'create_time'],
 });
 
 baTable.mount();
@@ -195,7 +196,8 @@ provide('baTable', baTable);
       <!-- 要使用`el-table`组件原有的属性，直接加在Table标签上即可 -->
       <Table ref="tableRef" />
 
-      <!-- 表单 -->
+      <!-- 对话框 -->
+      <ContainerStatusDialog />
       <PopupForm />
     </div>
   </div>
@@ -203,7 +205,7 @@ provide('baTable', baTable);
 
 <style scoped lang="scss">
 .table-opt-button .icon {
-  color: #8595F4 !important;
+  color: #8595f4 !important;
 }
 
 .welcome {

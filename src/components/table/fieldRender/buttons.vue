@@ -82,6 +82,41 @@
             <div v-if="btn.text" class="text">{{ getTranslation(btn.text) }}</div>
           </el-button>
         </el-tooltip>
+        <!-- 带下拉菜单的按钮 -->
+        <el-tooltip
+          v-if="btn.render == 'dropdownButton'"
+          :disabled="!(btn.title && !btn.disabledTip)"
+          :content="getTranslation(btn.title)"
+          placement="top"
+        >
+          <el-dropdown
+            @command="
+              (command) => {
+                onDropdownItemClick(btn, command);
+              }
+            "
+            trigger="click"
+          >
+            <el-button
+              v-blur
+              :class="btn.class"
+              class="ba-table-render-buttons-item"
+              :type="btn.type"
+              :disabled="btn.disabled && btn.disabled(row, field)"
+              v-bind="btn.attr"
+            >
+              <Icon v-if="btn.icon" :name="btn.icon" />
+              <div v-if="btn.text" class="text">{{ getTranslation(btn.text) }}</div>
+            </el-button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item v-for="(item, $index) in btn.dropdownMenu?.items" :key="$index" :command="item.command">
+                  {{ item.name }}
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </el-tooltip>
       </template>
     </template>
   </div>
@@ -105,9 +140,13 @@ const { t, te } = useI18n();
 const props = defineProps<Props>();
 const baTable = inject('baTable') as baTableClass;
 
+const onDropdownItemClick = (btn: OptButton, command: string | number | object) => {
+  btn.dropdownMenu?.handleCommand(command, props.row, props.field, baTable);
+};
+
 const onButtonClick = (btn: OptButton) => {
   if (typeof btn.click === 'function') {
-    btn.click(props.row, props.field);
+    btn.click(props.row, props.field, baTable);
     return;
   }
   baTable.onTableAction(btn.name, props);

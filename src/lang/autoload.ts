@@ -1,4 +1,4 @@
-import { homeBaseRoutePath } from '/src/router/static/homeBase';
+import { homeBaseRoutePath } from '/@/router/static/homeBase';
 
 /*
  * 语言包按需加载映射表

@@ -1,5 +1,6 @@
-import {TableColumnCtx} from "element-plus";
-import {i18n} from "/@/lang";
+import {TableColumnCtx} from 'element-plus';
+import {i18n} from '/@/lang';
+import type baTableClass from '/@/utils/baTable';
 
 /**
  * 获取单元格值
@@ -70,7 +71,7 @@ export const appOptButtons = (): OptButton[] => {
             disabledTip: false,
         },
         {
-            render: 'tipButton',
+            render: 'dropdownButton',
             name: 'invoke',
             title: '调用',
             text: '',
@@ -78,6 +79,22 @@ export const appOptButtons = (): OptButton[] => {
             icon: 'fa fa-paper-plane',
             class: 'table-opt-button',
             disabledTip: false,
+            dropdownMenu: {
+                handleCommand(command, row, field, baTable) {
+                    // TODO: 根据 command 进行不同方式的调用
+                    console.log(command);
+                },
+                items: [
+                    {
+                        command: 'basic',
+                        name: '普通调用',
+                    },
+                    {
+                        command: 'fast-start',
+                        name: '快速启动',
+                    },
+                ],
+            },
         },
         {
             render: 'tipButton',
@@ -89,7 +106,6 @@ export const appOptButtons = (): OptButton[] => {
             class: 'table-opt-button',
             disabledTip: false,
             click(row, field) {
-
                 console.log(row.id);
                 console.log(field);
             },
@@ -103,6 +119,14 @@ export const appOptButtons = (): OptButton[] => {
             icon: 'fa fa-cube',
             class: 'table-opt-button',
             disabledTip: false,
+            click(row, field, baTable: baTableClass) {
+                // TODO: 根据 row.id 调用后端 API 获取对应应用的容器状态
+                console.log(row.id);
+                baTable.form.items = {
+                    status: '从后端获取的状态信息',
+                };
+                baTable.toggleForm('ViewContainerStatus');
+            },
         },
         {
             render: 'confirmButton',
@@ -120,7 +144,6 @@ export const appOptButtons = (): OptButton[] => {
             },
             disabledTip: false,
         },
-
     ];
 };
 
