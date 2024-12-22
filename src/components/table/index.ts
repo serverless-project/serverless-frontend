@@ -1,7 +1,7 @@
-import {TableColumnCtx} from 'element-plus';
-import {i18n} from '/@/lang';
+import { TableColumnCtx } from 'element-plus';
+import { i18n } from '/@/lang';
 import type baTableClass from '/@/utils/baTable';
-import { ftBuild } from '/@/api/dashboard';
+import { ftBuild, ftDeploy, ftInvoke } from '/@/api/dashboard';
 
 /**
  * 获取单元格值
@@ -63,8 +63,12 @@ export const appOptButtons = (): OptButton[] => {
             click: async (row, field, baTable: baTableClass) => {
                 // TODO: 根据 row.id 调用后端 API 获取对应应用的容器状态
                 console.log(row);
-                const res = await ftBuild();
+                const res = await ftBuild({
+                    path: '123',
+                    name: '123'
+                });
                 console.log(res);
+                // TODO: 展示message结果
             },
         },
         {
@@ -76,6 +80,16 @@ export const appOptButtons = (): OptButton[] => {
             icon: 'fa fa-cloud-upload',
             class: 'table-opt-button',
             disabledTip: false,
+            click: async (row, field, baTable: baTableClass) => {
+                // TODO: 根据 row.id 调用后端 API 获取对应应用的容器状态
+                console.log(row);
+                const res = await ftDeploy({
+                    path: '123',
+                    name: '123'
+                });
+                console.log(res);
+                // TODO: 展示message结果
+            },
         },
         {
             render: 'dropdownButton',
@@ -87,9 +101,18 @@ export const appOptButtons = (): OptButton[] => {
             class: 'table-opt-button',
             disabledTip: false,
             dropdownMenu: {
-                handleCommand(command, row, field, baTable) {
-                    // TODO: 根据 command 进行不同方式的调用
-                    console.log(command);
+                async handleCommand(command, row, field, baTable) {
+                    // 根据 command 进行不同方式的调用
+                    console.log(command); // basic / fast-start
+                    if (command === 'basic') {
+                        console.log(row);
+                        const res = await ftInvoke({
+                            path: '123',
+                            name: '123'
+                        });
+                        console.log(res);
+                        // TODO: 展示message结果
+                    }
                 },
                 items: [
                     {
