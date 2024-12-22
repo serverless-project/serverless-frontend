@@ -1,4 +1,4 @@
-import { TableColumnCtx } from 'element-plus';
+import { ElMessage, TableColumnCtx } from 'element-plus';
 import { i18n } from '/@/lang';
 import type baTableClass from '/@/utils/baTable';
 import { ftBuild, ftDeploy, ftInvoke } from '/@/api/dashboard';
@@ -50,6 +50,10 @@ export const appOptButtons = (): OptButton[] => {
             icon: 'fa fa-code',
             class: 'table-opt-button',
             disabledTip: false,
+            click: async (row, field, baTable: baTableClass) => {
+                // TODO: 打开编辑器
+                window.open('https://www.baidu.com', '_blank');
+            },
         },
         {
             render: 'tipButton',
@@ -61,14 +65,18 @@ export const appOptButtons = (): OptButton[] => {
             class: 'table-opt-button',
             disabledTip: false,
             click: async (row, field, baTable: baTableClass) => {
-                // TODO: 根据 row.id 调用后端 API 获取对应应用的容器状态
                 console.log(row);
-                const res = await ftBuild({
-                    path: '123',
-                    name: '123'
-                });
-                console.log(res);
-                // TODO: 展示message结果
+                // TODO: 封装以下try-catch过程
+                // TODO: 修改参数
+                try {
+                    const res = await ftBuild({
+                        path: '123',
+                        name: '123'
+                    });
+                    ElMessage.success(res.data?.message)
+                } catch (err: any) {
+                    ElMessage.error(err?.message)
+                }
             },
         },
         {
@@ -81,14 +89,17 @@ export const appOptButtons = (): OptButton[] => {
             class: 'table-opt-button',
             disabledTip: false,
             click: async (row, field, baTable: baTableClass) => {
-                // TODO: 根据 row.id 调用后端 API 获取对应应用的容器状态
                 console.log(row);
-                const res = await ftDeploy({
-                    path: '123',
-                    name: '123'
-                });
-                console.log(res);
-                // TODO: 展示message结果
+                // TODO: 修改参数
+                try {
+                    const res = await ftDeploy({
+                        path: '123',
+                        name: '123'
+                    });
+                    ElMessage.success(res.data?.message)
+                } catch (err: any) {
+                    ElMessage.error(err?.message)
+                }
             },
         },
         {
@@ -106,12 +117,16 @@ export const appOptButtons = (): OptButton[] => {
                     console.log(command); // basic / fast-start
                     if (command === 'basic') {
                         console.log(row);
-                        const res = await ftInvoke({
-                            path: '123',
-                            name: '123'
-                        });
-                        console.log(res);
-                        // TODO: 展示message结果
+                        // TODO: 修改参数
+                        try {
+                            const res = await ftInvoke({
+                                path: '123',
+                                name: '123'
+                            });
+                            ElMessage.success(res.data?.message)
+                        } catch (err: any) {
+                            ElMessage.error(err?.message)
+                        }
                     }
                 },
                 items: [
