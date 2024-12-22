@@ -24,7 +24,7 @@
         "icon": "fa fa-code",
         "menu_type": "tab",
         "url": "testing",
-        "component": "/src/views/home/testing.vue",
+        "component": "/src/views/home/testing/testing.vue",
         "keepalive": "testing",
         "extend": "none",
         "children": []
