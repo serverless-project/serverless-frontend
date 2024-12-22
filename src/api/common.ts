@@ -30,7 +30,7 @@ export class baTableApi {
             url: this.actionUrl.get('index'),
             method: 'get',
             params: filter,
-        });
+        }, {}, {}, true);
     }
 
     edit(params: anyObj) {
@@ -38,7 +38,7 @@ export class baTableApi {
             url: this.actionUrl.get('edit'),
             method: 'get',
             params: params,
-        });
+        }, {}, {}, true);
     }
 
     del(ids: string[]) {
@@ -52,7 +52,7 @@ export class baTableApi {
             },
             {
                 showSuccessMessage: true,
-            }
+            }, {}, true
         );
     }
 
@@ -65,7 +65,7 @@ export class baTableApi {
             },
             {
                 showSuccessMessage: true,
-            }
+            }, {}, true
         );
     }
 
@@ -74,6 +74,6 @@ export class baTableApi {
             url: this.actionUrl.get('sortable'),
             method: 'post',
             data: data,
-        });
+        }, {}, {}, true);
     }
 }

@@ -1,6 +1,7 @@
-import {TableColumnCtx} from 'element-plus';
-import {i18n} from '/@/lang';
+import { ElMessage, TableColumnCtx } from 'element-plus';
+import { i18n } from '/@/lang';
 import type baTableClass from '/@/utils/baTable';
+import { ftBuild, ftDeploy, ftInvoke } from '/@/api/dashboard';
 
 /**
  * 获取单元格值
@@ -49,6 +50,10 @@ export const appOptButtons = (): OptButton[] => {
             icon: 'fa fa-code',
             class: 'table-opt-button',
             disabledTip: false,
+            click: async (row, field, baTable: baTableClass) => {
+                // TODO: 打开编辑器
+                window.open('https://www.baidu.com', '_blank');
+            },
         },
         {
             render: 'tipButton',
@@ -59,6 +64,20 @@ export const appOptButtons = (): OptButton[] => {
             icon: 'fa fa-wrench',
             class: 'table-opt-button',
             disabledTip: false,
+            click: async (row, field, baTable: baTableClass) => {
+                console.log(row);
+                // TODO: 封装以下try-catch过程
+                // TODO: 修改参数
+                try {
+                    const res = await ftBuild({
+                        path: '123',
+                        name: '123'
+                    });
+                    ElMessage.success(res.data?.message)
+                } catch (err: any) {
+                    ElMessage.error(err?.message)
+                }
+            },
         },
         {
             render: 'tipButton',
@@ -69,6 +88,19 @@ export const appOptButtons = (): OptButton[] => {
             icon: 'fa fa-cloud-upload',
             class: 'table-opt-button',
             disabledTip: false,
+            click: async (row, field, baTable: baTableClass) => {
+                console.log(row);
+                // TODO: 修改参数
+                try {
+                    const res = await ftDeploy({
+                        path: '123',
+                        name: '123'
+                    });
+                    ElMessage.success(res.data?.message)
+                } catch (err: any) {
+                    ElMessage.error(err?.message)
+                }
+            },
         },
         {
             render: 'dropdownButton',
@@ -80,9 +112,22 @@ export const appOptButtons = (): OptButton[] => {
             class: 'table-opt-button',
             disabledTip: false,
             dropdownMenu: {
-                handleCommand(command, row, field, baTable) {
-                    // TODO: 根据 command 进行不同方式的调用
-                    console.log(command);
+                async handleCommand(command, row, field, baTable) {
+                    // 根据 command 进行不同方式的调用
+                    console.log(command); // basic / fast-start
+                    if (command === 'basic') {
+                        console.log(row);
+                        // TODO: 修改参数
+                        try {
+                            const res = await ftInvoke({
+                                path: '123',
+                                name: '123'
+                            });
+                            ElMessage.success(res.data?.message)
+                        } catch (err: any) {
+                            ElMessage.error(err?.message)
+                        }
+                    }
                 },
                 items: [
                     {

@@ -17,6 +17,21 @@
     {
         "id": 2,
         "pid": 0,
+        "type": "menu",
+        "title": "测试",
+        "name": "testing",
+        "path": "testing",
+        "icon": "fa fa-code",
+        "menu_type": "tab",
+        "url": "testing",
+        "component": "/src/views/home/testing/testing.vue",
+        "keepalive": "testing",
+        "extend": "none",
+        "children": []
+    },
+    {
+        "id": 3,
+        "pid": 0,
         "type": "menu_dir",
         "title": "其他",
         "name": "other",
@@ -29,10 +44,10 @@
         "extend": "none",
         "children": [
             {
-                "id": "2-1",
+                "id": "3-1",
                 "pid": 0,
                 "type": "menu",
-                "title": "测试",
+                "title": "样例页",
                 "name": "test",
                 "path": "test",
                 "icon": "fa fa-code",
