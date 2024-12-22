@@ -1,6 +1,7 @@
 import {TableColumnCtx} from 'element-plus';
 import {i18n} from '/@/lang';
 import type baTableClass from '/@/utils/baTable';
+import { ftBuild } from '/@/api/dashboard';
 
 /**
  * 获取单元格值
@@ -59,6 +60,12 @@ export const appOptButtons = (): OptButton[] => {
             icon: 'fa fa-wrench',
             class: 'table-opt-button',
             disabledTip: false,
+            click: async (row, field, baTable: baTableClass) => {
+                // TODO: 根据 row.id 调用后端 API 获取对应应用的容器状态
+                console.log(row);
+                const res = await ftBuild();
+                console.log(res);
+            },
         },
         {
             render: 'tipButton',

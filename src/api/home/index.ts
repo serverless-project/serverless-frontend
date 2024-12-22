@@ -4,14 +4,14 @@ export function getRoutes() {
     return createAxios({
         url: '/data/home/routes.json', //TODO: 修为后端实际 API 地址
         method: 'get',
-    });
+    }, {}, {}, true);
 }
 
 export function getSiteConfig() {
     return createAxios({
         url: '/data/home/site-config.json',
         method: 'get',
-    });
+    }, {}, {}, true);
 }
 
 /**
@@ -21,5 +21,5 @@ export function getUserInfo() {
     return createAxios({
         url: '/data/home/user-info.json',
         method: 'get',
-    });
+    }, {}, {}, true);
 }

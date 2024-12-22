@@ -30,10 +30,11 @@ interface Options {
 export function createAxios<Data = any, T = ApiPromise<Data>>(
     axiosConfig: AxiosRequestConfig,
     options: Options = {},
-    loading: LoadingOptions = {}
+    loading: LoadingOptions = {},
+    mock: boolean = false,
 ): T {
     const axiosInstance = axios.create({
-        baseURL: '',
+        baseURL: mock ? window.location.protocol + '//' + window.location.host : getUrl(),
         timeout: 1000 * 10,
         headers: {},
         responseType: 'json',
