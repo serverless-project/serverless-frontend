@@ -10,12 +10,16 @@ export const useUserInfo = defineStore('userInfo', {
             nickname: '',
             avatar: '',
             last_login_time: '',
+            token: ''
         };
     },
     actions: {
         dataFill(state: UserInfo) {
             this.$state = { ...this.$state, ...state };
         },
+        setToken(token:string) {
+            this.$state.token = token;
+        }
     },
     persist: {
         key: USER_INFO,

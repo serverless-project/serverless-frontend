@@ -2,37 +2,39 @@
     "list": [
         {
             "id": 1,
-            "name": "应用1",
-            "desc": "这是第一个被部署的应用",
-            "status": "running",
-            "create_time": 1734424269
+            "name": "chammeleon",
+            "desc": "网页渲染",
+            "status": "unbuild",
+            "create_time": 1734424269,
+            "path": "/home/xdy/faasit/demo-202405/demo-chammeleon"
         },
         {
             "id": 2,
-            "name": "应用2",
-            "desc": "dfasdfsdahhhgdfgs",
-            "status": "running",
-            "create_time": 1734425000
+            "name": "mlpipe",
+            "desc": "机器学习",
+            "status": "unbuild",
+            "create_time": 1734425000,
+            "path": "/home/xdy/faasit/demo-202405/demo-mlpipeline"
         },
         {
             "id": 3,
             "name": "应用3",
             "desc": "sadfasdfasdfasdfa",
-            "status": "stopped",
+            "status": "unbuild",
             "create_time": 10000
         },
         {
             "id": 4,
             "name": "应用4",
             "desc": "阿巴阿巴巴巴巴",
-            "status": "starting",
+            "status": "unbuild",
             "create_time": 1634424269
         },
         {
             "id": 5,
             "name": "test",
             "desc": "1111",
-            "status": "running",
+            "status": "unbuild",
             "create_time": 1734424269
         }
     ]

@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import axios from 'axios';
+import { getUrl } from '/@/utils/axios';
+import { useUserInfo } from '/@/stores/userInfo';
 
 const username = ref('');
 const password = ref('');
@@ -22,9 +25,20 @@ onMounted(() => {
 const router = useRouter();
 
 const login = () => {
-  // TODO: 调用后端登录接口
-  router.push({ path: '/home' }).catch((err) => {
-    console.log(err);
+  const formData = new FormData();
+  formData.append('username', username.value);
+  formData.append('password', password.value);
+  axios.post(getUrl() + '/account/login', formData).then((response) => {
+    if (response.status === 200) {
+      // 登录成功
+      console.log('登录成功');
+      const userInfo = useUserInfo();
+      userInfo.setToken(response.data.access_token);
+      // this.$store.commit('auth', response.data.access_token);  
+      router.push({ path: '/home' }).catch((err) => {
+        console.log(err);
+      });
+    }
   });
 };
 </script>

@@ -1,13 +1,14 @@
 import type { AxiosRequestConfig } from 'axios';
 import axios from 'axios';
 import { type LoadingOptions } from 'element-plus';
+import { useUserInfo } from '/@/stores/userInfo';
 
 /**
  * 根据运行环境获取基础请求URL
  */
 export const getUrl = (): string => {
     const value: string = import.meta.env.VITE_AXIOS_BASE_URL as string
-    return value == 'getCurrentDomain' ? window.location.protocol + '//' + window.location.host : value
+    return (value == 'getCurrentDomain' ? window.location.protocol + '//' + window.location.host : value) + '/api/v1'
 }
 
 interface Options {
@@ -33,10 +34,12 @@ export function createAxios<Data = any, T = ApiPromise<Data>>(
     loading: LoadingOptions = {},
     mock: boolean = false,
 ): T {
+    const userInfo = useUserInfo()
     const axiosInstance = axios.create({
         baseURL: mock ? window.location.protocol + '//' + window.location.host : getUrl(),
-        timeout: 1000 * 10,
-        headers: {},
+        headers: {
+            'Authorization': 'Bearer ' + userInfo.token
+        },
         responseType: 'json',
     });
     // TODO: 为 axios 添加自定义配置

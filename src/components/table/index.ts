@@ -66,14 +66,16 @@ export const appOptButtons = (): OptButton[] => {
             disabledTip: false,
             click: async (row, field, baTable: baTableClass) => {
                 console.log(row);
-                // TODO: 封装以下try-catch过程
-                // TODO: 修改参数
+                console.log(baTable)
+                row.status = 'building';
                 try {
+                    ElMessage.success('Project is building...');
                     const res = await ftBuild({
-                        path: '123',
-                        name: '123'
+                        path: row.path,
+                        name: row.name
                     });
                     ElMessage.success(res.data?.message)
+                    row.status = 'builded';
                 } catch (err: any) {
                     ElMessage.error(err?.message)
                 }
@@ -90,12 +92,14 @@ export const appOptButtons = (): OptButton[] => {
             disabledTip: false,
             click: async (row, field, baTable: baTableClass) => {
                 console.log(row);
-                // TODO: 修改参数
+                row.status = 'deploying'
                 try {
+                    ElMessage.success('Project is deploying...');
                     const res = await ftDeploy({
-                        path: '123',
-                        name: '123'
+                        path: row.path,
+                        name: row.name
                     });
+                    row.status = 'deployed'
                     ElMessage.success(res.data?.message)
                 } catch (err: any) {
                     ElMessage.error(err?.message)
@@ -115,28 +119,30 @@ export const appOptButtons = (): OptButton[] => {
                 async handleCommand(command, row, field, baTable) {
                     // 根据 command 进行不同方式的调用
                     console.log(command); // basic / fast-start
-                    if (command === 'basic') {
-                        console.log(row);
-                        // TODO: 修改参数
-                        try {
-                            const res = await ftInvoke({
-                                path: '123',
-                                name: '123'
-                            });
-                            ElMessage.success(res.data?.message)
-                        } catch (err: any) {
-                            ElMessage.error(err?.message)
-                        }
+                    console.log(row);
+                    // TODO: 修改参数
+                    command = command.toString()
+                    row.status = 'running'
+                    try {
+                        const res = await ftInvoke({
+                            path: row.path,
+                            name: row.name,
+                            mode: command
+                        });
+                        row.status = 'stopped'
+                        ElMessage.success(res.data?.message)
+                    } catch (err: any) {
+                        ElMessage.error(err?.message)
                     }
                 },
                 items: [
                     {
                         command: 'basic',
-                        name: '普通调用',
+                        name: 'baseline',
                     },
                     {
                         command: 'fast-start',
-                        name: '快速启动',
+                        name: 'spilot',
                     },
                 ],
             },
