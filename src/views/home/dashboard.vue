@@ -94,7 +94,7 @@ const panelsRef = ref<Panel[]>([
       name: 'fa fa-microchip',
       color: '#4682B4',
     },
-    32,
+    64,
     'GB'
   ),
   new Panel(

@@ -210,12 +210,18 @@ declare global {
         items: DropdownItem[];              // 下拉菜单项的定义
     }
 
+    interface MultiSelectDropdownMenu {
+        // 点击下拉菜单项后调用的函数
+        confirm: (selected: string[], row: TableRow, field: TableColumn, baTable: baTableClass) => void;
+        items: DropdownItem[];              // 下拉菜单项的定义
+    }
+
     /**
      * 表格右侧操作按钮
      */
     interface OptButton {
-        // 渲染方式:tipButton=带tip的按钮,confirmButton=带确认框的按钮,moveButton=移动按钮,basicButton=普通按钮,dropdownButton=带下拉菜单的按钮
-        render: 'tipButton' | 'confirmButton' | 'moveButton' | 'basicButton' | 'dropdownButton';
+        // 渲染方式:tipButton=带tip的按钮,confirmButton=带确认框的按钮,moveButton=移动按钮,basicButton=普通按钮,dropdownButton=带下拉菜单的按钮,multiSelectDropdownButton=带下拉菜单的按钮（复选+确认）
+        render: 'tipButton' | 'confirmButton' | 'moveButton' | 'basicButton' | 'dropdownButton' | 'multiSelectDropdownButton';
         name: string;
         title?: string;
         text?: string;
@@ -224,6 +230,7 @@ declare global {
         icon: string;
         popconfirm?: Partial<Mutable<PopconfirmProps>>;
         dropdownMenu?: DropdownMenu;
+        multiSelectDropdownMenu?: MultiSelectDropdownMenu;
         disabledTip?: boolean;
         // 自定义点击事件
         click?: (row: TableRow, field: TableColumn, baTable: baTableClass) => void;

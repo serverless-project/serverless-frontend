@@ -99,7 +99,6 @@
                 onDropdownItemClick(btn, command);
               }
             "
-            trigger="click"
           >
             <el-button
               v-blur
@@ -121,6 +120,41 @@
             </template>
           </el-dropdown>
         </el-tooltip>
+
+        <!-- 带复选和确认的下拉菜单按钮 -->
+        <el-tooltip
+          v-if="btn.render == 'multiSelectDropdownButton'"
+          :disabled="!(btn.title && !btn.disabledTip)"
+          :content="getTranslation(btn.title)"
+          placement="top"
+          :show-after="500"
+        >
+          <el-dropdown :hide-on-click="false">
+            <el-button
+              v-blur
+              :class="btn.class"
+              class="ba-table-render-buttons-item"
+              :type="btn.type"
+              :disabled="btn.disabled && btn.disabled(row, field)"
+              v-bind="btn.attr"
+            >
+              <Icon v-if="btn.icon" :name="btn.icon" />
+              <div v-if="btn.text" class="text">{{ getTranslation(btn.text) }}</div>
+            </el-button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-checkbox-group v-model="selectedItems">
+                  <el-dropdown-item v-for="(item, index) in btn.multiSelectDropdownMenu?.items" :key="index" style="padding: 0 8px">
+                    <el-checkbox :label="item.command">{{ item.name }}</el-checkbox>
+                  </el-dropdown-item>
+                </el-checkbox-group>
+                <el-button size="small" type="primary" class="ba-table-multi-select-confirm" @click="onMultiSelectConfirmClick(btn)">
+                  {{ getTranslation(btn.title) }}
+                </el-button>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </el-tooltip>
       </template>
     </template>
   </div>
@@ -128,7 +162,7 @@
 
 <script setup lang="ts">
 import { TableColumnCtx } from 'element-plus';
-import { inject } from 'vue';
+import { inject, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type baTableClass from '/@/utils/baTable';
 import Icon from '/@/components/icon/index.vue';
@@ -143,6 +177,12 @@ interface Props {
 const { t, te } = useI18n();
 const props = defineProps<Props>();
 const baTable = inject('baTable') as baTableClass;
+
+const selectedItems = ref<string[]>([]);
+
+const onMultiSelectConfirmClick = (btn: OptButton) => {
+  btn.multiSelectDropdownMenu?.confirm(selectedItems.value, props.row, props.field, baTable);
+};
 
 const onDropdownItemClick = (btn: OptButton, command: string | number | object) => {
   btn.dropdownMenu?.handleCommand(command, props.row, props.field, baTable);
@@ -163,6 +203,11 @@ const getTranslation = (key?: string) => {
 </script>
 
 <style scoped lang="scss">
+.ba-table-multi-select-confirm {
+  display: block;
+  margin: 5px auto;
+}
+
 .ba-table-render-buttons-item {
   padding: 4px 5px;
   height: auto;

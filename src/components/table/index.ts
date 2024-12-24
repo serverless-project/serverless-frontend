@@ -107,7 +107,7 @@ export const appOptButtons = (): OptButton[] => {
             },
         },
         {
-            render: 'dropdownButton',
+            render: 'multiSelectDropdownButton',
             name: 'invoke',
             title: '调用',
             text: '',
@@ -115,25 +115,26 @@ export const appOptButtons = (): OptButton[] => {
             icon: 'fa fa-play',
             class: 'table-opt-button',
             disabledTip: false,
-            dropdownMenu: {
-                async handleCommand(command, row, field, baTable) {
+            multiSelectDropdownMenu: {
+                async confirm(selected, row, field, baTable) {
                     // 根据 command 进行不同方式的调用
-                    console.log(command); // basic / fast-start
+                    console.log(selected);
                     console.log(row);
-                    // TODO: 修改参数
-                    command = command.toString()
-                    row.status = 'running'
-                    try {
-                        const res = await ftInvoke({
-                            path: row.path,
-                            name: row.name,
-                            mode: command
-                        });
-                        row.status = 'stopped'
-                        ElMessage.success(res.data?.message)
-                    } catch (err: any) {
-                        ElMessage.error(err?.message)
-                    }
+                    selected.forEach(async (mode) => {
+                        row.status = 'running'
+                        try {
+                            const res = await ftInvoke({
+                                path: row.path,
+                                name: row.name,
+                                mode: mode
+                            });
+                            row.status = 'stopped'
+                            ElMessage.success(res.data?.message)
+                        } catch (err: any) {
+                            ElMessage.error(err?.message)
+                        }
+                    })
+
                 },
                 items: [
                     {
