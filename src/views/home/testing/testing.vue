@@ -44,6 +44,7 @@ import { defineComponent, ref, onMounted } from "vue";
 import { ElMessage, ElMessageBox } from 'element-plus';
 import LatencyBar from "./components/LatencyBar.vue";
 import ThroughputBar from "./components/ThroughputBar.vue";
+import { createAxios } from "/@/utils/axios";
 const template_data={
           labels: [],
           datasets: [
@@ -69,12 +70,51 @@ export default defineComponent({
     // )
   },
   methods: {
-    plotTestData(metric: string) {
-      let url = "/api/v1/get_demodata"
-      let data = {
-        metric: metric 
+    async plotTestData(metric: string) {
+      let url = "/ft/get_demo_data"
+      const names = ['chammeleon','mlpipe']
+      const modes = ['spilot','baseline']
+      console.log(this.$refs.LatencyBar)
+      let chartData = {
+        labels: ['chammeleon', 'mlpipe', 'runvk'],
+        datasets: [
+          {
+            label: 'Spilot',
+            backgroundColor: 'red',
+            data: [0, 0, 0]
+          },
+          {
+            label: 'Baseline',
+            backgroundColor: 'blue',
+            data: [0, 0, 0]
+          }
+        ]
       }
-
+      for (const name of names) {
+        for (const mode of modes) {
+          console.log(name)
+          console.log(mode)
+          const data = {
+            name: name,
+            mode: mode,
+            metric: 'latency'
+          }
+          const resp = await createAxios({
+              url: url,
+              method: 'post',
+              data: data,
+          })
+          const result = resp.data.data
+          console.log(result)
+          const labels = chartData.labels
+          const appIndex = labels.indexOf(name)
+          const modeIndex = modes.indexOf(mode)
+          if (appIndex != -1 && modeIndex != -1) {
+            chartData.datasets[modeIndex].data[appIndex] = result
+          }
+        }
+      }
+      this.$refs.LatencyBar.chartData = chartData
       // reqInstance().post(url, data, { 
       //   headers: {
       //     'Access-Control-Allow-Origin': '*'
@@ -100,6 +140,7 @@ export default defineComponent({
 
       //   }
       // )
+      
     },
     clearAllData(metric: string) {
       // if (metric == "latency") {

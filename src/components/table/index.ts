@@ -137,11 +137,11 @@ export const appOptButtons = (): OptButton[] => {
                 },
                 items: [
                     {
-                        command: 'basic',
+                        command: 'baseline',
                         name: 'baseline',
                     },
                     {
-                        command: 'fast-start',
+                        command: 'spilot',
                         name: 'spilot',
                     },
                 ],

@@ -17,17 +17,17 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 const test_data = 
 {
-    labels: ['AI1', 'AI2', 'AI3'],
+    labels: ['chammeleon', 'mlpipe', 'runvk'],
     datasets: [
       {
         label: 'spilot',
         backgroundColor: 'red',
-        data: [65, 59, 80]
+        data: [0, 0, 0]
       },
       {
         label: 'Baseline',
         backgroundColor: 'blue',
-        data: [40, 20, 12]
+        data: [0, 0, 0]
       }
     ]
 };

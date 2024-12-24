@@ -2,8 +2,8 @@ FROM node:18.0.0 AS build
 WORKDIR /app
 COPY . /app/
 
-# RUN npm config set registry=https://registry.npmmirror.com \
-#     && cd /app && npm install && npm run build
+RUN npm config set registry=https://registry.npmmirror.com \
+    && cd /app && npm install && npm run build
 
 FROM nginx:latest AS run
 

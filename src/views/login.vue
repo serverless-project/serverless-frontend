@@ -25,6 +25,13 @@ onMounted(() => {
 const router = useRouter();
 
 const login = () => {
+  const env: string = import.meta.env.MODE as string
+  if (env == 'development') {
+    router.push({ path: '/home' }).catch((err) => {
+      console.log(err);
+    });
+    return;
+  }
   const formData = new FormData();
   formData.append('username', username.value);
   formData.append('password', password.value);
