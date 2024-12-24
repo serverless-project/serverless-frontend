@@ -112,7 +112,7 @@ export const appOptButtons = (): OptButton[] => {
             title: '调用',
             text: '',
             type: 'text',
-            icon: 'fa fa-paper-plane',
+            icon: 'fa fa-play',
             class: 'table-opt-button',
             disabledTip: false,
             dropdownMenu: {
@@ -149,25 +149,11 @@ export const appOptButtons = (): OptButton[] => {
         },
         {
             render: 'tipButton',
-            name: 'dag',
-            title: 'DAG',
-            text: '',
-            type: 'text',
-            icon: 'fa fa-share-alt',
-            class: 'table-opt-button',
-            disabledTip: false,
-            click(row, field) {
-                console.log(row.id);
-                console.log(field);
-            },
-        },
-        {
-            render: 'tipButton',
             name: 'status',
-            title: '容器状态',
+            title: '状态',
             text: '',
             type: 'text',
-            icon: 'fa fa-cube',
+            icon: 'fa fa-info-circle',
             class: 'table-opt-button',
             disabledTip: false,
             click(row, field, baTable: baTableClass) {

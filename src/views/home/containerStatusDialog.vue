@@ -15,7 +15,7 @@ const baTable = inject('baTable') as baTableClass;
   >
     <template #header>
       <div class="title" v-drag="['.ba-operate-dialog', '.el-dialog__header']" v-zoom="'.ba-operate-dialog'">
-        {{ '容器状态' }}
+        {{ '状态' }}
       </div>
     </template>
     <span>

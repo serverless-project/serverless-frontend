@@ -25,9 +25,18 @@ const statisticValueStyle: CSSProperties = {
 
 onActivated(() => {});
 
-onMounted(() => {
-  initCountUp();
-});
+// const mockNumbers = [8, 5456, 9486, 875];
+
+// const initCountUp = () => {
+//   // TODO: 从后端获取数据
+//   for (let i = 0; i < panelsRef.value.length; i++) {
+//     panelsRef.value[i].number = mockNumbers[i];
+//   }
+// };
+
+// onMounted(() => {
+//   initCountUp();
+// });
 
 onBeforeMount(() => {});
 
@@ -67,46 +76,37 @@ const panelsRef = ref<Panel[]>([
       name: 'fa fa-object-group',
       color: '#F48595',
     },
-    0,
+    8,
     '6/8'
   ),
   new Panel(
-    '项目2',
+    '集群节点数',
     {
-      name: 'fa fa-line-chart',
-      color: '#8595F4',
+      name: 'fa fa-sitemap',
+      color: '#6A5ACD',
     },
-    0,
-    '某指标'
+    8,
+    '个'
   ),
   new Panel(
-    '项目3',
+    '内存',
     {
-      name: 'fa fa-users',
-      color: '#74A8B5',
+      name: 'fa fa-microchip',
+      color: '#4682B4',
     },
-    0,
-    '某指标'
+    32,
+    'GB'
   ),
   new Panel(
-    '项目4',
+    'CPU',
     {
-      name: 'fa fa-file-text',
-      color: '#AD85F4',
+      name: 'fa fa-server',
+      color: '#20B2AA',
     },
-    0,
-    '某指标'
+    16,
+    '核'
   ),
 ]);
-
-const mockNumbers = [8, 5456, 9486, 875];
-
-const initCountUp = () => {
-  // TODO: 从后端获取数据
-  for (let i = 0; i < panelsRef.value.length; i++) {
-    panelsRef.value[i].number = mockNumbers[i];
-  }
-};
 
 const baTable = new baTableClass(new baTableApi('/data/home/app/'), {
   column: [
@@ -132,12 +132,24 @@ const baTable = new baTableClass(new baTableApi('/data/home/app/'), {
       prop: 'status',
       align: 'left',
       render: 'tag',
-      custom: { stopped: 'danger', running: 'success', starting: 'warning',unbuild: 'info', building: 'info', builded: 'success', deploying: 'info', deployed: 'success' },
-      replaceValue: { 
+      custom: {
+        stopped: 'danger',
+        running: 'success',
+        starting: 'warning',
+        unbuild: 'info',
+        building: 'info',
+        builded: 'success',
+        deploying: 'info',
+        deployed: 'success',
+      },
+      replaceValue: {
         unbuild: '未构建',
-        building: '构建中', builded: '已构建', 
-        deploying: '部署中', deployed: '已部署',
-        running: '运行中', stopped: '已停止',
+        building: '构建中',
+        builded: '已构建',
+        deploying: '部署中',
+        deployed: '已部署',
+        running: '运行中',
+        stopped: '已停止',
       },
       width: 80,
     },
@@ -166,6 +178,18 @@ baTable.mount();
 baTable.getIndex();
 
 provide('baTable', baTable);
+
+// 监视baTable.table.data的变化，更新
+watch(() => baTable.table.data, (newData, oldData) => {
+  console.log('Data has been updated:', newData);
+  const totalApps = newData?.length || 0;
+  const deployedApps = newData?.filter(app => app.status === 'deployed' || app.status === 'running').length || 0;
+  panelsRef.value[0].number = totalApps;
+  panelsRef.value[0].metric = `${deployedApps}/${totalApps}`;
+}, {
+  deep: true
+});
+
 </script>
 
 <template>
