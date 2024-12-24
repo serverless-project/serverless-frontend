@@ -1,7 +1,7 @@
 import { ElMessage, TableColumnCtx } from 'element-plus';
 import { i18n } from '/@/lang';
 import type baTableClass from '/@/utils/baTable';
-import { ftBuild, ftDeploy, ftInvoke } from '/@/api/dashboard';
+import { ftBuild, ftDeploy, ftGetLog, ftInvoke } from '/@/api/dashboard';
 
 /**
  * 获取单元格值
@@ -117,33 +117,41 @@ export const appOptButtons = (): OptButton[] => {
             disabledTip: false,
             multiSelectDropdownMenu: {
                 async confirm(selected, row, field, baTable) {
-                    // 根据 command 进行不同方式的调用
                     console.log(selected);
-                    console.log(row);
-                    selected.forEach(async (mode) => {
-                        row.status = 'running'
-                        try {
-                            const res = await ftInvoke({
-                                path: row.path,
-                                name: row.name,
-                                mode: mode
-                            });
-                            row.status = 'stopped'
-                            ElMessage.success(res.data?.message)
-                        } catch (err: any) {
-                            ElMessage.error(err?.message)
-                        }
-                    })
+                    ElMessage.success('Invokeing...');
+                    // selected.forEach(async (mode) => {
+                    const mode = 'spilot'
+                    row.status = 'running'
+                    try {
+                        const res = await ftInvoke({
+                            path: row.path,
+                            name: row.name,
+                            mode: mode
+                        });
+                        row.status = 'stopped'
+                        ElMessage.success(res.data?.message)
+                    } catch (err: any) {
+                        ElMessage.error(err?.message)
+                    }
+                    // })
 
                 },
                 items: [
                     {
-                        command: 'baseline',
-                        name: 'baseline',
+                        command: 'fast-start',
+                        name: '快速启动',
                     },
                     {
-                        command: 'spilot',
-                        name: 'spilot',
+                        command: 'network-optimize',
+                        name: '网络优化',
+                    },
+                    {
+                        command: 'consistent-storage',
+                        name: '一致存储',
+                    },
+                    {
+                        command: 'performance-isolate',
+                        name: '性能隔离',
                     },
                 ],
             },
@@ -157,11 +165,14 @@ export const appOptButtons = (): OptButton[] => {
             icon: 'fa fa-info-circle',
             class: 'table-opt-button',
             disabledTip: false,
-            click(row, field, baTable: baTableClass) {
-                // TODO: 根据 row.id 调用后端 API 获取对应应用的容器状态
-                console.log(row.id);
+            click: async (row, field, baTable: baTableClass) => {
+                // TODO: 每隔一段时间获取一次日志
+                const res = await ftGetLog({
+                    name: row.name
+                });
+
                 baTable.form.items = {
-                    status: '从后端获取的状态信息',
+                    status: res?.data,
                 };
                 baTable.toggleForm('ViewContainerStatus');
             },

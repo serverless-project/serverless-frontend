@@ -1,0 +1,56 @@
+2024-12-23 15:22:28,293 INFO Placement: {'stage0': 'cloud'}
+2024-12-23 15:22:28,328 INFO Deleting service chammeleon-stage0 in namespace default
+2024-12-23 15:22:28,361 INFO Deleting service kubernetes in namespace default
+2024-12-23 15:22:28,385 INFO Deleting service redis-service in namespace default
+2024-12-23 15:22:28,419 INFO Deleted pod redis-pod
+2024-12-23 15:22:28,441 INFO Deleted secret spilot-redis-config
+2024-12-23 15:22:31,441 INFO Applying worker from /home/xdy/ServerlessPilot-ApiServer/venv/lib/python3.11/site-packages/serverless_framework/redis.yaml
+2024-12-23 15:22:31,512 INFO Redis created.
+2024-12-23 15:22:31,512 INFO ================= Test 0 =================
+2024-12-23 15:22:31,512 INFO Deleting all the workers with command: kubectl delete -f ./chammeleon-stage0.yaml  --grace-period=0
+Error from server (NotFound): error when deleting "./chammeleon-stage0.yaml": services "chammeleon-stage0" not found
+2024-12-23 15:22:34,598 INFO Initializing engin and stage status...
+2024-12-23 15:22:34,598 INFO Initializing redis and preloading data...
+2024-12-23 15:22:38,314 INFO Traditional mode. Launching all workers...
+2024-12-23 15:22:38,314 INFO Applying worker from ./chammeleon-stage0.yaml
+2024-12-23 15:22:48,375 INFO Engine0: launching...
+2024-12-23 15:22:48,482 INFO Engine0: ['stage0'] succeeded.
+2024-12-23 15:22:48,586 INFO Engine0: finished! all retval={'stage0': Result.Ok(
+    <html>
+    <head>
+        <title>Chameleon Page - Simple Web Application</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            h1 { color: #333366; }
+            ul { background-color: #f0f0f0; padding: 20px; }
+            li { color: #663333; }
+            footer { font-size: 0.8em; color: #777777; margin-top: 20px; }
+        </style>
+    </head>
+    <body>
+        <h1>Welcome to Chameleon Page!</h1>
+        <p>Hello, Guest! Thank you for visiting.</p>
+        <ul>
+            <li>
+                Item 1
+            </li>
+            <li>
+                Item 2
+            </li>
+            <li>
+                Item 3
+            </li>
+        </ul>
+        <footer>
+            <p>Last updated at: 2024-12-23 15:22:48.427829</p>
+        </footer>
+    </body>
+    </html>
+    )}
+2024-12-23 15:22:48,586 INFO =============== Test finished! =================
+2024-12-23 15:22:48,586 INFO Thput: 4.739101647153468 RPS
+2024-12-23 15:22:48,586 INFO Latency (s): min=0.20732617378234863, avg=0.20732617378234863 p50=0.20732617378234863, p90=0.20732617378234863 p99=0.20732617378234863, p999=0.20732617378234863, p100=0.20732617378234863
+2024-12-23 15:22:48,586 INFO =============== Overall Test finished! =================
+2024-12-23 15:22:48,586 INFO Repeat 1 times, each time 1 requests.
+2024-12-23 15:22:48,587 INFO Overall thput: 4.739101647153468 RPS
+2024-12-23 15:22:48,587 INFO Overall latency (s): min=0.20732617378234863, avg=0.20732617378234863 p50=0.20732617378234863, p90=0.20732617378234863 p99=0.20732617378234863, p999=0.20732617378234863, p100=0.20732617378234863

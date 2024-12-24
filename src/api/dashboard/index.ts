@@ -11,6 +11,7 @@ export function ftBuild(body: {
     data: body
   });
 }
+
 export function ftDeploy(body: {
   path: string,
   name: string,
@@ -32,4 +33,16 @@ export function ftInvoke(body: {
     method: 'post',
     data: body
   });
+}
+
+export function ftGetLog(body: {
+  name: string,
+  mode?: string,
+  metric?: string
+}) {
+  return createAxios({
+    url: '/data/home/log_example.log',
+    method: 'get',
+    data: body
+  }, {}, {}, true);
 }

@@ -180,16 +180,18 @@ baTable.getIndex();
 provide('baTable', baTable);
 
 // 监视baTable.table.data的变化，更新
-watch(() => baTable.table.data, (newData, oldData) => {
-  console.log('Data has been updated:', newData);
-  const totalApps = newData?.length || 0;
-  const deployedApps = newData?.filter(app => app.status === 'deployed' || app.status === 'running').length || 0;
-  panelsRef.value[0].number = totalApps;
-  panelsRef.value[0].metric = `${deployedApps}/${totalApps}`;
-}, {
-  deep: true
-});
-
+watch(
+  () => baTable.table.data,
+  (newData, oldData) => {
+    const totalApps = newData?.length || 0;
+    const deployedApps = newData?.filter((app) => app.status === 'stopped' || app.status === 'deployed' || app.status === 'running').length || 0;
+    panelsRef.value[0].number = totalApps;
+    panelsRef.value[0].metric = `${deployedApps}/${totalApps}`;
+  },
+  {
+    deep: true,
+  }
+);
 </script>
 
 <template>
