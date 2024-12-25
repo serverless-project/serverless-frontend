@@ -25,7 +25,7 @@ onMounted(() => {
 const router = useRouter();
 
 const login = () => {
-  const env: string = import.meta.env.MODE as string
+  const env: string = import.meta.env.MODE as string;
   if (env == 'development') {
     router.push({ path: '/home' }).catch((err) => {
       console.log(err);
@@ -41,7 +41,7 @@ const login = () => {
       console.log('登录成功');
       const userInfo = useUserInfo();
       userInfo.setToken(response.data.access_token);
-      // this.$store.commit('auth', response.data.access_token);  
+      // this.$store.commit('auth', response.data.access_token);
       router.push({ path: '/home' }).catch((err) => {
         console.log(err);
       });
@@ -117,8 +117,7 @@ const login = () => {
 
       <div class="toggle-box">
         <div class="toggle-panel toggel-left">
-          <h1>LOGO</h1>
-          <p>未创建账号</p>
+          <img class="logo-img" src="/images/logo.png" alt="logo" />
 
           <button class="btn register-btn">注册</button>
         </div>
@@ -133,6 +132,11 @@ const login = () => {
 </template>
 
 <style scoped lang="scss">
+.logo-img {
+  width: 100px;
+  margin-bottom: 10px;
+}
+
 * {
   margin: 0;
   padding: 0;

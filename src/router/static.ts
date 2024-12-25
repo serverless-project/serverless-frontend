@@ -1,10 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router';
 import { homeBaseRoutePath } from "/@/router/static/homeBase";
 
-const pageTitle = (name: string): string => {
-    return `pagesTitle.${name}`;
-};
-
 /*
  * 静态路由
  * 自动加载 ./static 目录的所有文件，并 push 到以下数组
@@ -22,7 +18,7 @@ const staticRoutes: Array<RouteRecordRaw> = [
         name: 'login',
         component: () => import('/@/views/login.vue'),
         meta: {
-            title: pageTitle('login'),
+            title: '登录',
         },
     },
     {
@@ -35,7 +31,7 @@ const staticRoutes: Array<RouteRecordRaw> = [
         name: 'notFound',
         component: () => import('/@/views/common/error/404.vue'),
         meta: {
-            title: pageTitle('notFound'), // 页面不存在
+            title: '页面不存在',
         },
     },
     {
@@ -44,7 +40,7 @@ const staticRoutes: Array<RouteRecordRaw> = [
         name: 'noPower',
         component: () => import('/@/views/common/error/401.vue'),
         meta: {
-            title: pageTitle('noPower'),
+            title: '无权限访问',
         },
     },
     {

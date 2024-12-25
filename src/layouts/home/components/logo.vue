@@ -23,7 +23,7 @@ import { closeShade } from '/@/utils/pageShade';
 import { Session } from '/@/utils/storage';
 import { BEFORE_RESIZE_LAYOUT } from '/@/stores/constant/cacheKey';
 import { setNavTabsWidth } from '/@/utils/layout';
-import Icon from "/@/components/icon/index.vue";
+import Icon from '/@/components/icon/index.vue';
 
 const config = useConfig();
 const siteConfig = useSiteConfig();
