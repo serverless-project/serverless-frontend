@@ -41,8 +41,11 @@ export function ftGetLog(body: {
   metric?: string
 }) {
   return createAxios({
-    url: '/data/home/log_example.log',
-    method: 'get',
+    url: '/ft/logs',
+    method: 'post',
     data: body
-  }, {}, {}, true);
+  });
+  return {
+    data: 'hello'
+  }
 }

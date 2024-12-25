@@ -51,7 +51,7 @@ export default defineComponent({
           y: {
             title: {
               display: true,
-              text: 'Throughput(s)',
+              text: 'Throughput(rps)',
               // font: {
               //   size: 20
               // }

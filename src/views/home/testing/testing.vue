@@ -74,8 +74,24 @@ export default defineComponent({
       let url = "/ft/get_demo_data"
       const names = ['chammeleon','mlpipe']
       const modes = ['spilot','baseline']
+      const matrics = ['latency','throughput']
       console.log(this.$refs.LatencyBar)
-      let chartData = {
+      let latencyChartData = {
+        labels: ['chammeleon', 'mlpipe', 'runvk'],
+        datasets: [
+          {
+            label: 'Spilot',
+            backgroundColor: 'red',
+            data: [0, 0, 0]
+          },
+          {
+            label: 'Baseline',
+            backgroundColor: 'blue',
+            data: [0, 0, 0]
+          }
+        ]
+      }
+      let throughputChartData = {
         labels: ['chammeleon', 'mlpipe', 'runvk'],
         datasets: [
           {
@@ -92,29 +108,38 @@ export default defineComponent({
       }
       for (const name of names) {
         for (const mode of modes) {
-          console.log(name)
-          console.log(mode)
-          const data = {
-            name: name,
-            mode: mode,
-            metric: 'latency'
-          }
-          const resp = await createAxios({
-              url: url,
-              method: 'post',
-              data: data,
-          })
-          const result = resp.data.data
-          console.log(result)
-          const labels = chartData.labels
-          const appIndex = labels.indexOf(name)
-          const modeIndex = modes.indexOf(mode)
-          if (appIndex != -1 && modeIndex != -1) {
-            chartData.datasets[modeIndex].data[appIndex] = result
+          for (const metric of matrics) {
+            console.log(name)
+            console.log(mode)
+            console.log(metric)
+            const data = {
+              name: name,
+              mode: mode,
+              metric: metric
+            }
+            const resp = await createAxios({
+                url: url,
+                method: 'post',
+                data: data,
+            })
+            const result = resp.data.data
+            console.log(result)
+            const labels = latencyChartData.labels
+            const appIndex = labels.indexOf(name)
+            const modeIndex = modes.indexOf(mode)
+            if (appIndex != -1 && modeIndex != -1) {
+              if (metric == "latency") {
+                latencyChartData.datasets[modeIndex].data[appIndex] = result
+              }
+              if (metric == "throughput") {
+                throughputChartData.datasets[modeIndex].data[appIndex] = result
+              }
+            }
           }
         }
       }
-      this.$refs.LatencyBar.chartData = chartData
+      this.$refs.LatencyBar.chartData = latencyChartData
+      this.$refs.ThroughputBar.chartData = throughputChartData
       // reqInstance().post(url, data, { 
       //   headers: {
       //     'Access-Control-Allow-Origin': '*'

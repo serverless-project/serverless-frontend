@@ -2,6 +2,7 @@ import { ElMessage, TableColumnCtx } from 'element-plus';
 import { i18n } from '/@/lang';
 import type baTableClass from '/@/utils/baTable';
 import { ftBuild, ftDeploy, ftGetLog, ftInvoke } from '/@/api/dashboard';
+import router from '/@/router';
 
 /**
  * 获取单元格值
@@ -52,7 +53,7 @@ export const appOptButtons = (): OptButton[] => {
             disabledTip: false,
             click: async (row, field, baTable: baTableClass) => {
                 // TODO: 打开编辑器
-                window.open('https://www.baidu.com', '_blank');
+                window.open('http://192.168.28.220/code', '_blank');
             },
         },
         {
@@ -118,18 +119,25 @@ export const appOptButtons = (): OptButton[] => {
             multiSelectDropdownMenu: {
                 async confirm(selected, row, field, baTable) {
                     console.log(selected);
-                    ElMessage.success('Invokeing...');
+                    ElMessage.success('Invoking...');
                     // selected.forEach(async (mode) => {
                     const mode = 'spilot'
                     row.status = 'running'
                     try {
-                        const res = await ftInvoke({
+                        const res1 = await ftInvoke({
                             path: row.path,
                             name: row.name,
-                            mode: mode
+                            mode: 'baseline'
                         });
+                        const res2 = await ftInvoke({
+                            path: row.path,
+                            name: row.name,
+                            mode: 'spilot'
+                        });
+                        ElMessage.success(res1.data?.message)
+                        ElMessage.success(res2.data?.message)
+
                         row.status = 'stopped'
-                        ElMessage.success(res.data?.message)
                     } catch (err: any) {
                         ElMessage.error(err?.message)
                     }
@@ -166,14 +174,17 @@ export const appOptButtons = (): OptButton[] => {
             class: 'table-opt-button',
             disabledTip: false,
             click: async (row, field, baTable: baTableClass) => {
-                // TODO: 每隔一段时间获取一次日志
-                const res = await ftGetLog({
-                    name: row.name
-                });
-
-                baTable.form.items = {
-                    status: res?.data,
-                };
+                // TODO: 关掉的时候清除定时器
+                setInterval(async () => {
+                    const res = await ftGetLog({
+                        name: row.name,
+                        mode: 'baseline'
+                    });
+    
+                    baTable.form.items = {
+                        status: res.data.data,
+                    };
+                },1000)
                 baTable.toggleForm('ViewContainerStatus');
             },
         },
