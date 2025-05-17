@@ -108,10 +108,10 @@ export default class baTable {
         return this.api
             .index(this.table.filter)
             .then((res: any) => {
-                this.table.data = res.data.list;
+                this.table.data = res.data?.data;
+                this.table.total = res.data?.data.length;
                 console.log(res);
-                this.table.total = res.data.total;
-                this.table.remark = res.data.remark;
+                // this.table.remark = res.data.remark;
                 this.runAfter('getIndex', { res });
             })
             .finally(() => {
@@ -292,7 +292,7 @@ export default class baTable {
                     this.postDel([data.row[this.table.pk!]]);
                 },
             ],
-            ['field-change', () => {}],
+            ['field-change', () => { }],
             [
                 'com-search',
                 () => {

@@ -1,5 +1,6 @@
 import { createAxios, getUrl } from '/@/utils/axios';
 import { homeBaseRoutePath } from '/@/router/static/homeBase';
+import qs from 'qs';
 
 export const terminalUrl = homeBaseRoutePath + '/ajax/terminal';
 
@@ -17,7 +18,7 @@ export class baTableApi {
     constructor(controllerUrl: string) {
         this.controllerUrl = controllerUrl;
         this.actionUrl = new Map([
-            ['index', controllerUrl + 'index.json'],
+            ['index', controllerUrl + 'index'],
             ['add', controllerUrl + 'add'],
             ['edit', controllerUrl + 'edit'],
             ['del', controllerUrl + 'del'],
@@ -30,7 +31,7 @@ export class baTableApi {
             url: this.actionUrl.get('index'),
             method: 'get',
             params: filter,
-        }, {}, {}, true);
+        }, {}, {});
     }
 
     edit(params: anyObj) {
@@ -42,6 +43,8 @@ export class baTableApi {
     }
 
     del(ids: string[]) {
+        console.log(ids);
+
         return createAxios(
             {
                 url: this.actionUrl.get('del'),
@@ -49,10 +52,13 @@ export class baTableApi {
                 params: {
                     ids: ids,
                 },
+                paramsSerializer: (params) => {
+                    return qs.stringify(params, { arrayFormat: 'repeat' });
+                },
             },
             {
                 showSuccessMessage: true,
-            }, {}, true
+            }, {}
         );
     }
 
@@ -65,7 +71,7 @@ export class baTableApi {
             },
             {
                 showSuccessMessage: true,
-            }, {}, true
+            }, {}
         );
     }
 

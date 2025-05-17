@@ -72,8 +72,8 @@ export const appOptButtons = (): OptButton[] => {
                 try {
                     ElMessage.success('Project is building...');
                     const res = await ftBuild({
-                        path: row.path,
-                        name: row.name
+                        path: row.app_path,
+                        name: row.app_name
                     });
                     ElMessage.success(res.data?.message)
                     row.status = 'builded';
@@ -97,8 +97,8 @@ export const appOptButtons = (): OptButton[] => {
                 try {
                     ElMessage.success('Project is deploying...');
                     const res = await ftDeploy({
-                        path: row.path,
-                        name: row.name
+                        path: row.app_path,
+                        name: row.app_name
                     });
                     row.status = 'deployed'
                     ElMessage.success(res.data?.message)
