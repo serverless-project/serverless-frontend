@@ -11,6 +11,10 @@ import PopupForm from '/@/views/home/popupForm.vue';
 import TableHeader from '/@/components/table/header/index.vue';
 import Table from '/@/components/table/index.vue';
 import ContainerStatusDialog from '/@/views/home/containerStatusDialog.vue';
+import { useUserInfo } from '/@/stores/userInfo';
+import axios from 'axios';
+import { getUrl } from '/@/utils/axios';
+import { convertCompilerOptionsFromJson } from 'typescript';
 
 defineOptions({
   name: 'dashboard',
@@ -38,7 +42,19 @@ onActivated(() => {});
 //   initCountUp();
 // });
 
-onBeforeMount(() => {});
+const userInfo = useUserInfo();
+
+onBeforeMount(() => {
+  axios.get(getUrl() + '/profile/global').then((res) => {
+    if (res.status === 200) {
+      panelsRef.value[1].number = res.data.node_number;
+      panelsRef.value[2].number = res.data.mem_size;
+      panelsRef.value[3].number = res.data.cpu_number;
+    }
+  }).catch((err) => {
+    console.error(err);
+  });
+});
 
 onUnmounted(() => {});
 
@@ -85,7 +101,7 @@ const panelsRef = ref<Panel[]>([
       name: 'fa fa-sitemap',
       color: '#6A5ACD',
     },
-    8,
+    0,
     '个'
   ),
   new Panel(
@@ -94,7 +110,7 @@ const panelsRef = ref<Panel[]>([
       name: 'fa fa-microchip',
       color: '#4682B4',
     },
-    64,
+    0,
     'GB'
   ),
   new Panel(
@@ -103,7 +119,7 @@ const panelsRef = ref<Panel[]>([
       name: 'fa fa-server',
       color: '#20B2AA',
     },
-    16,
+    0,
     '核'
   ),
 ]);
@@ -197,7 +213,7 @@ watch(
 <template>
   <div class="default-main">
     <!-- 应用看板 -->
-    <div class="small-panel-box">
+    <div class="small-panel-box" v-if="userInfo.is_superuser">
       <el-row :gutter="20">
         <el-col :sm="12" :lg="6" v-for="(panel, $index) in panelsRef" :key="$index">
           <div class="small-panel user-reg suspension">

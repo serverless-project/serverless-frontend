@@ -101,6 +101,8 @@ export interface UserInfo {
     avatar: string
     last_login_time: string
     token: string
+    is_superuser: boolean
+    email: string
 }
 
 export interface AdminInfo {

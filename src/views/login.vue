@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed} from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 import { getUrl } from '/@/utils/axios';
@@ -7,6 +7,9 @@ import { useUserInfo } from '/@/stores/userInfo';
 
 const username = ref('');
 const password = ref('');
+const reg_username = ref('');
+const reg_email = ref('');
+const reg_password = ref('');
 
 onMounted(() => {
   const container = document.querySelector('.container') as Element;
@@ -26,11 +29,14 @@ const router = useRouter();
 
 const login = () => {
   const env: string = import.meta.env.MODE as string;
-  if (env == 'development') {
-    router.push({ path: '/home' }).catch((err) => {
-      console.log(err);
-    });
-    return;
+  // if (env == 'development') {
+  //   router.push({ path: '/home' }).catch((err) => {
+  //     console.log(err);
+  //   });
+  //   return;
+  // }
+  if (!username.value || !password.value) {
+    return; // 终止函数执行
   }
   const formData = new FormData();
   formData.append('username', username.value);
@@ -41,13 +47,70 @@ const login = () => {
       console.log('登录成功');
       const userInfo = useUserInfo();
       userInfo.setToken(response.data.access_token);
+      const now = new Date();
+      userInfo.dataFill({
+        username: username.value,
+        nickname: username.value,
+        id: response.data.id,
+        is_superuser: response.data.is_superuser,
+        avatar: userInfo.avatar,
+        last_login_time: now.toLocaleString(),
+        token: userInfo.token,
+        email: response.data.email,
+      });
       // this.$store.commit('auth', response.data.access_token);
       router.push({ path: '/home' }).catch((err) => {
         console.log(err);
       });
     }
+  })
+  .catch(error => {
+    if (error.response.status === 401) {
+      console.error("数据错误：", error.response.data.detail); // 打印后端验证错误
+      alert("用户名或密码错误！");
+    }
   });
 };
+
+// 检查邮箱格式是否合法
+const isEmailValid = computed(() => {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(reg_email.value);
+});
+
+// 检查密码是否至少6位
+const isPasswordValid = computed(() => reg_password.value.length >= 6);
+
+const register = () => {
+  if (!reg_username.value || !reg_password.value || !reg_email.value) {
+        return; // 终止函数执行
+      }
+  if (!isEmailValid.value) {
+    alert("请输入有效的邮箱地址！");
+    return;
+  }
+  if (!isPasswordValid.value) {
+    alert("密码至少需要6位！");
+    return;
+  }
+  const formData = new FormData();
+  formData.append('username', reg_username.value);
+  formData.append('password', reg_password.value);
+  formData.append('email', reg_email.value);
+
+  // console.log('注册信息：', formData);
+  axios.post(getUrl() + '/account/register', formData).then((response) => {
+    if (response.status === 200) {
+      console.log('注册成功');
+      alert("注册成功！请返回登陆页面！");
+    }
+  })
+  .catch(error => {
+    console.error("注册失败："); // 打印后端验证错误
+    console.error(error.response.data.detail);
+  });
+}
+
 </script>
 
 <template>
@@ -58,12 +121,12 @@ const login = () => {
         <form @submit.prevent>
           <h1>欢迎</h1>
           <div class="input-box">
-            <input type="text" placeholder="username" v-model="username" />
+            <input type="text" placeholder="username" required v-model="username" />
             <i class="bx bxs-user"></i>
           </div>
           <div class="input-box">
             <!-- placeholder是未输入时的背景提示 -->
-            <input type="password" placeholder="password" v-model="password" />
+            <input type="password" placeholder="password" required v-model="password" />
             <i class="bx bxs-lock-alt"></i>
           </div>
           <!--        <div class="forgot-link">-->
@@ -88,19 +151,19 @@ const login = () => {
         <form action="">
           <h1>注册</h1>
           <div class="input-box">
-            <input type="text" placeholder="Username" required />
+            <input type="text" placeholder="Username" required v-model="reg_username"/>
             <i class="bx bxs-user"></i>
           </div>
           <div class="input-box">
-            <input type="email" placeholder="Email" required />
+            <input type="email" placeholder="Email" required v-model="reg_email"/>
             <i class="bx bx-envelope bx-flip-horizontal"></i>
           </div>
           <div class="input-box">
             <!-- placeholder是未输入时的背景提示 -->
-            <input type="password" placeholder="password" required />
+            <input type="password" placeholder="password" required  v-model="reg_password"/>
             <i class="bx bxs-lock-alt"></i>
           </div>
-
+          <button @click="register" class="btn">注册</button>
           <!--        <button type="submit" class="btn">确定</button>-->
           <!--        <p>使用其他社交平台登录</p>-->
           <!--        &lt;!&ndash; 社交平台登录图标和名称 &ndash;&gt;-->
