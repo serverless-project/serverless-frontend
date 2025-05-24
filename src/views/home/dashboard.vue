@@ -76,8 +76,8 @@ const panelsRef = ref<Panel[]>([
       name: 'fa fa-object-group',
       color: '#F48595',
     },
-    8,
-    '6/8'
+    0,
+    '0/0'
   ),
   new Panel(
     '集群节点数',
@@ -85,7 +85,7 @@ const panelsRef = ref<Panel[]>([
       name: 'fa fa-sitemap',
       color: '#6A5ACD',
     },
-    8,
+    0,
     '个'
   ),
   new Panel(
@@ -94,7 +94,7 @@ const panelsRef = ref<Panel[]>([
       name: 'fa fa-microchip',
       color: '#4682B4',
     },
-    64,
+    0,
     'GB'
   ),
   new Panel(
@@ -103,7 +103,7 @@ const panelsRef = ref<Panel[]>([
       name: 'fa fa-server',
       color: '#20B2AA',
     },
-    16,
+    0,
     '核'
   ),
 ]);

@@ -1,7 +1,7 @@
 import { ElMessage, TableColumnCtx } from 'element-plus';
 import { i18n } from '/@/lang';
 import type baTableClass from '/@/utils/baTable';
-import { ftBuild, ftDeploy, ftGetLog, ftInvoke } from '/@/api/dashboard';
+import { ftBuild, ftDeploy, ftInvoke } from '/@/api/dashboard';
 import router from '/@/router';
 
 /**
@@ -53,7 +53,8 @@ export const appOptButtons = (): OptButton[] => {
             disabledTip: false,
             click: async (row, field, baTable: baTableClass) => {
                 // TODO: 打开编辑器
-                window.open('http://192.168.28.220/code', '_blank');
+                // window.open('http://192.168.28.220/code', '_blank');
+                window.open(`http://localhost:8088/?folder=${row.app_path}`, '_blank');
             },
         },
         {
@@ -121,23 +122,23 @@ export const appOptButtons = (): OptButton[] => {
                     console.log(selected);
                     ElMessage.success('Invoking...');
                     // selected.forEach(async (mode) => {
-                    const mode = 'spilot'
-                    row.status = 'running'
+                    // const mode = 'spilot'
+                    row.app_status = 'running'
                     try {
                         const res1 = await ftInvoke({
-                            path: row.path,
-                            name: row.name,
+                            path: row.app_path,
+                            name: row.app_name,
                             mode: 'baseline'
                         });
-                        const res2 = await ftInvoke({
-                            path: row.path,
-                            name: row.name,
-                            mode: 'spilot'
-                        });
+                        // const res2 = await ftInvoke({
+                        //     path: row.app_path,
+                        //     name: row.app_name,
+                        //     mode: 'spilot'
+                        // });
                         ElMessage.success(res1.data?.message)
-                        ElMessage.success(res2.data?.message)
+                        // ElMessage.success(res2.data?.message)
 
-                        row.status = 'stopped'
+                        row.app_status = 'stopped'
                     } catch (err: any) {
                         ElMessage.error(err?.message)
                     }
@@ -173,18 +174,30 @@ export const appOptButtons = (): OptButton[] => {
             icon: 'fa fa-info-circle',
             class: 'table-opt-button',
             disabledTip: false,
-            click: async (row, field, baTable: baTableClass) => {
-                // TODO: 关掉的时候清除定时器
-                setInterval(async () => {
-                    const res = await ftGetLog({
-                        name: row.name,
-                        mode: 'baseline'
-                    });
-    
+            click: (row, field, baTable) => {
+
+                // 建立 WebSocket 长连接
+                let wsBaseUrl = import.meta.env.VITE_AXIOS_BASE_URL.replace('http', 'ws').replace('localhost', '127.0.0.1');
+                const ws = new WebSocket(`${wsBaseUrl}/ft/ws/logs/${row.app_name}`);
+
+                ws.onopen = () => {
+                    console.log("WebSocket connected");
+                };
+
+                ws.onmessage = (event) => {
+                    const logData = event.data;
                     baTable.form.items = {
-                        status: res.data.data,
+                        status: logData,
                     };
-                },1000)
+                };
+
+                ws.onclose = () => {
+                    console.log("WebSocket disconnected");
+                };
+
+                // 保存 ws 实例以便关闭（例如表单关闭的时候）
+                (baTable as any).ws = ws;
+
                 baTable.toggleForm('ViewContainerStatus');
             },
         },

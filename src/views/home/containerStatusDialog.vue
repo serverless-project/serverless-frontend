@@ -14,21 +14,28 @@ watch(
   (newStatus) => {
     if (newStatus) {
       highlightedLog.value = hljs.highlight(newStatus, { language: 'plaintext' }).value;
+    } else {
+      highlightedLog.value = ''
     }
   }
 );
+
+const closeWs = () => {
+  if ((baTable as any).ws) {
+    (baTable as any).ws.close();
+    (baTable as any).ws = null;
+    console.log('WebSocket closed on dialog close');
+  }
+};
 </script>
 
 <template>
-  <el-dialog
-    class="ba-operate-dialog"
-    :close-on-click-modal="false"
-    :destroy-on-close="true"
+  <el-dialog class="ba-operate-dialog" :close-on-click-modal="false" :destroy-on-close="true"
     :model-value="['ViewContainerStatus'].includes(baTable.form.operate!)"
-    @close="baTable.toggleForm()"
-  >
+    @close="() => { closeWs(); baTable.toggleForm(); }">
     <template #header>
-      <div class="title" v-drag="['.ba-operate-dialog', '.el-dialog__header']" v-zoom="'.ba-operate-dialog'">状态-调用日志</div>
+      <div class="title" v-drag="['.ba-operate-dialog', '.el-dialog__header']" v-zoom="'.ba-operate-dialog'">状态-调用日志
+      </div>
     </template>
     <pre v-html="highlightedLog"></pre>
   </el-dialog>
@@ -42,6 +49,6 @@ pre {
   white-space: pre-wrap;
   word-wrap: break-word;
   height: 550px;
-  overflow-y: scroll; 
+  overflow-y: scroll;
 }
 </style>
