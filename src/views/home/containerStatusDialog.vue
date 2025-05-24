@@ -10,7 +10,7 @@ const baTable = inject('baTable') as baTableClass;
 const highlightedLog = ref('');
 
 watch(
-  () => baTable.form.items!.status,
+  () => baTable.form.items?.status,
   (newStatus) => {
     if (newStatus) {
       highlightedLog.value = hljs.highlight(newStatus, { language: 'plaintext' }).value;

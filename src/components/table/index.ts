@@ -3,6 +3,7 @@ import { i18n } from '/@/lang';
 import type baTableClass from '/@/utils/baTable';
 import { ftBuild, ftDeploy, ftInvoke } from '/@/api/dashboard';
 import router from '/@/router';
+import { cloneDeep } from 'lodash-es';
 
 /**
  * 获取单元格值
@@ -45,7 +46,7 @@ export const appOptButtons = (): OptButton[] => {
         {
             render: 'tipButton',
             name: 'edit',
-            title: 'Edit',
+            title: '代码编辑器',
             text: '',
             type: 'text',
             icon: 'fa fa-code',
@@ -200,6 +201,20 @@ export const appOptButtons = (): OptButton[] => {
 
                 baTable.toggleForm('ViewContainerStatus');
             },
+        },
+        {
+            render: 'tipButton',
+            name: 'edit',
+            title: 'Edit',
+            text: '',
+            type: 'text',
+            icon: 'fa fa-pencil',
+            class: 'table-row-edit',
+            disabledTip: false,
+            click: (row, field, baTable) => {
+                baTable.form.items = cloneDeep(row);
+                baTable.toggleForm('editDialog', [row.app_id]);
+            }
         },
         {
             render: 'confirmButton',

@@ -11,6 +11,7 @@ import PopupForm from '/@/views/home/popupForm.vue';
 import TableHeader from '/@/components/table/header/index.vue';
 import Table from '/@/components/table/index.vue';
 import ContainerStatusDialog from '/@/views/home/containerStatusDialog.vue';
+import EditDialog from '/@/views/home/editDialog.vue';
 
 defineOptions({
   name: 'dashboard',
@@ -237,6 +238,8 @@ watch(
       <!-- 对话框 -->
       <ContainerStatusDialog />
       <PopupForm />
+      <EditDialog />
+
     </div>
   </div>
 </template>

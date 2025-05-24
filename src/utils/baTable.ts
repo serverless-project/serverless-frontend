@@ -188,7 +188,11 @@ export default class baTable {
      */
     onSubmit = (formEl: FormInstance | undefined = undefined) => {
         // 当前操作的首字母小写
-        const operate = this.form.operate!.replace(this.form.operate![0], this.form.operate![0].toLowerCase());
+        let operate = this.form.operate!.replace(this.form.operate![0], this.form.operate![0].toLowerCase());
+
+        if (operate === 'editDialog') {
+            operate = 'edit'
+        }
 
         if (!this.runBefore('onSubmit', { formEl: formEl, operate: operate, items: this.form.items! })) return;
 
