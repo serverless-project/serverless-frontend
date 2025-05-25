@@ -108,10 +108,10 @@ export default class baTable {
         return this.api
             .index(this.table.filter)
             .then((res: any) => {
-                this.table.data = res.data.list;
+                this.table.data = res.data?.data;
+                this.table.total = res.data?.data.length;
                 console.log(res);
-                this.table.total = res.data.total;
-                this.table.remark = res.data.remark;
+                // this.table.remark = res.data.remark;
                 this.runAfter('getIndex', { res });
             })
             .finally(() => {
@@ -188,7 +188,11 @@ export default class baTable {
      */
     onSubmit = (formEl: FormInstance | undefined = undefined) => {
         // 当前操作的首字母小写
-        const operate = this.form.operate!.replace(this.form.operate![0], this.form.operate![0].toLowerCase());
+        let operate = this.form.operate!.replace(this.form.operate![0], this.form.operate![0].toLowerCase());
+
+        if (operate === 'editDialog') {
+            operate = 'edit'
+        }
 
         if (!this.runBefore('onSubmit', { formEl: formEl, operate: operate, items: this.form.items! })) return;
 
@@ -292,7 +296,7 @@ export default class baTable {
                     this.postDel([data.row[this.table.pk!]]);
                 },
             ],
-            ['field-change', () => {}],
+            ['field-change', () => { }],
             [
                 'com-search',
                 () => {

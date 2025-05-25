@@ -1,9 +1,9 @@
 <template>
   <el-dialog style="height: 350px;" class="ba-operate-dialog" :close-on-click-modal="false" :destroy-on-close="true"
-    :model-value="['Add', 'Edit'].includes(baTable.form.operate!)" @close="baTable.toggleForm">
+    :model-value="['editDialog'].includes(baTable.form.operate!)" @close="baTable.toggleForm">
     <template #header>
       <div class="title" v-drag="['.ba-operate-dialog', '.el-dialog__header']" v-zoom="'.ba-operate-dialog'">
-        {{ baTable.form.operate ? t(baTable.form.operate) : '' }}
+        编辑
       </div>
     </template>
     <el-scrollbar v-loading="baTable.form.loading" class="ba-table-form-scrollbar">

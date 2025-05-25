@@ -11,6 +11,7 @@ import PopupForm from '/@/views/home/popupForm.vue';
 import TableHeader from '/@/components/table/header/index.vue';
 import Table from '/@/components/table/index.vue';
 import ContainerStatusDialog from '/@/views/home/containerStatusDialog.vue';
+import EditDialog from '/@/views/home/editDialog.vue';
 import { useUserInfo } from '/@/stores/userInfo';
 import axios from 'axios';
 import { getUrl } from '/@/utils/axios';
@@ -27,7 +28,7 @@ const statisticValueStyle: CSSProperties = {
   fontSize: '28px',
 };
 
-onActivated(() => {});
+onActivated(() => { });
 
 // const mockNumbers = [8, 5456, 9486, 875];
 
@@ -56,11 +57,11 @@ onBeforeMount(() => {
   });
 });
 
-onUnmounted(() => {});
+onUnmounted(() => { });
 
 watch(
   () => navTabs.state.tabFullScreen,
-  () => {}
+  () => { }
 );
 
 class Panel {
@@ -92,8 +93,8 @@ const panelsRef = ref<Panel[]>([
       name: 'fa fa-object-group',
       color: '#F48595',
     },
-    8,
-    '6/8'
+    0,
+    '0/0'
   ),
   new Panel(
     '集群节点数',
@@ -124,28 +125,36 @@ const panelsRef = ref<Panel[]>([
   ),
 ]);
 
-const baTable = new baTableClass(new baTableApi('/data/home/app/'), {
+const baTable = new baTableClass(new baTableApi('/application/'), {
+  pk: 'app_id',
   column: [
     { type: 'selection', align: 'center', operator: false },
-    { label: 'ID', prop: 'id', align: 'left', operator: '=', operatorPlaceholder: 'ID', width: 70 },
+    { label: 'ID', prop: 'app_id', align: 'left', operator: '=', operatorPlaceholder: 'ID', width: 70 },
     {
       label: '应用名称',
-      prop: 'name',
+      prop: 'app_name',
       align: 'left',
       operator: 'LIKE',
       operatorPlaceholder: t('Fuzzy query'),
       width: 150,
     },
+        {
+      label: '路径',
+      prop: 'app_path',
+      align: 'left',
+      operator: 'LIKE',
+      operatorPlaceholder: t('Fuzzy query'),
+    },
     {
       label: '描述',
-      prop: 'desc',
+      prop: 'app_description',
       align: 'left',
       operator: 'LIKE',
       operatorPlaceholder: t('Fuzzy query'),
     },
     {
       label: t('State'),
-      prop: 'status',
+      prop: 'app_status',
       align: 'left',
       render: 'tag',
       custom: {
@@ -179,7 +188,7 @@ const baTable = new baTableClass(new baTableApi('/data/home/app/'), {
     },
     {
       label: t('Create time'),
-      prop: 'create_time',
+      prop: 'generate_time',
       align: 'left',
       render: 'datetime',
       sortable: 'custom',
@@ -231,13 +240,12 @@ watch(
     </div>
     <!-- 应用列表 -->
     <div class="default-main ba-table-box" style="margin: 0">
-      <el-alert class="ba-table-alert" v-if="baTable.table.remark" :title="baTable.table.remark" type="info" show-icon />
+      <el-alert class="ba-table-alert" v-if="baTable.table.remark" :title="baTable.table.remark" type="info"
+        show-icon />
       <!-- 表格顶部菜单 -->
-      <TableHeader
-        style="outline: none"
+      <TableHeader style="outline: none"
         :buttons="['refresh', 'add', 'delete', 'comSearch', 'quickSearch', 'columnDisplay']"
-        quick-search-placeholder="根据应用名称进行搜索"
-      />
+        quick-search-placeholder="根据应用名称进行搜索" />
 
       <!-- 表格 -->
       <!-- 要使用`el-table`组件原有的属性，直接加在Table标签上即可 -->
@@ -246,6 +254,8 @@ watch(
       <!-- 对话框 -->
       <ContainerStatusDialog />
       <PopupForm />
+      <EditDialog />
+
     </div>
   </div>
 </template>
