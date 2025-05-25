@@ -36,6 +36,7 @@ export default {
         'Are you sure you want to restore all configurations to the default values?': '确定要恢复全部配置到默认值吗？',
         'Restore default': '恢复默认',
         'personal data': '个人资料',
+        'Change password':'修改密码',
         cancellation: '注销',
         'Dark mode': '暗黑模式',
         'Exit full screen': '退出全屏',

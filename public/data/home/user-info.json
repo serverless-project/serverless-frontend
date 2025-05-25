@@ -3,5 +3,6 @@
     "username": "admin",
     "nickname": "Admin",
     "avatar": "/images/avatar.png",
-    "last_login_time": "2024-12-16 14:26:49"
+    "last_login_time": "2024-12-16 14:26:49",
+    "is_superuser": true
 }

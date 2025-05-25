@@ -42,13 +42,13 @@ const init = async () => {
   const res = {
     routes: (await getRoutes()).data,
     siteConfig: (await getSiteConfig()).data as SiteConfig,
-    userInfo: (await getUserInfo()).data as UserInfo,
+    // userInfo: (await getUserInfo()).data as UserInfo,
   };
 
   // 初始化网页配置
   siteConfig.dataFill(res.siteConfig);
   siteConfig.setInitialize(true);
-  userInfo.dataFill(res.userInfo);
+  // userInfo.dataFill(res.userInfo);
   siteConfig.setUserInitialize(true);
 
   // 初始化主页路由

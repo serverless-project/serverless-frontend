@@ -107,7 +107,7 @@
       @hide="onCurrentNavMenu(false, 'userInfo')"
       placement="bottom-end"
       :hide-after="0"
-      :width="260"
+      :width="300"
       trigger="click"
       popper-class="admin-info-box"
       v-model:visible="state.showAdminInfoPopover"
@@ -128,6 +128,36 @@
         </div>
         <div class="admin-info-footer">
           <el-button @click="onAdminInfo" type="primary" plain>{{ t('layouts.personal data') }}</el-button>
+          <el-dialog v-model="userInfoDialogVisible" title="用户信息修改">
+            <el-form>
+              <el-form-item label="用户名">
+                <el-input v-model="change_username" placeholder="请输入用户名"/>
+              </el-form-item>
+              <el-form-item label="邮箱  ">
+                <el-input v-model="change_email" type="email" placeholder="请输入邮箱"/>
+              </el-form-item>
+            </el-form>
+
+            <template #footer>
+              <el-button @click="userInfoDialogVisible = false">取消</el-button>
+              <el-button type="primary" @click="changeUserInfo">提交</el-button>
+            </template>
+          </el-dialog>
+          <el-button @click="changePassword" type="warning" plain>{{ t('layouts.Change password') }}</el-button>
+          <el-dialog v-model="passwordDialogVisible" title="密码修改">
+            <el-form>
+              <el-form-item label="原密码">
+                <el-input type="password" v-model="change_old_password" placeholder="请输入原密码"/>
+              </el-form-item>
+              <el-form-item label="新密码">
+                <el-input type="password" v-model="change_new_password" placeholder="请输入新密码"/>
+              </el-form-item>
+            </el-form>
+            <template #footer>
+              <el-button @click="passwordDialogVisible = false">取消</el-button>
+              <el-button type="primary" @click="innerChangePassword">提交</el-button>
+            </template>
+          </el-dialog>
           <el-button @click="onLogout" type="danger" plain>{{ t('layouts.cancellation') }}</el-button>
         </div>
       </div>
@@ -159,6 +189,9 @@ import { Local, Session } from '/@/utils/storage';
 import { hotUpdateState, reloadServer } from '/@/utils/vite';
 import { useUserInfo } from '/@/stores/userInfo';
 import Icon from "/@/components/icon/index.vue";
+import axios from 'axios';
+import { getUrl } from '/@/utils/axios';
+import { assert } from 'console';
 
 const { t } = useI18n();
 
@@ -168,12 +201,102 @@ const terminal = useTerminal();
 const siteConfig = useSiteConfig();
 const reloadHotServerPopover = ref<PopoverInstance>();
 
+const userInfoDialogVisible = ref(false);
+const passwordDialogVisible = ref(false);
+
+const change_username = ref(userInfo.username);
+const change_email = ref(userInfo.email);
+const change_old_password = ref('');
+const change_new_password = ref('');
+
 const state = reactive({
   isFullScreen: false,
   currentNavMenu: '',
   showLayoutDrawer: false,
   showAdminInfoPopover: false,
 });
+
+const changeUserInfo = () => {
+  if (!change_username.value || !change_email.value) {
+    alert("请填写用户名和邮箱！");
+    return; // 终止函数执行
+  }
+  if (change_username.value === userInfo.username && change_email.value === userInfo.email) {
+    alert("没有修改任何信息。");
+    return; // 终止函数执行
+  }
+  axios.post(getUrl() + '/account/update', {
+    id: userInfo.id,
+    username: change_username.value,
+    email: change_email.value,
+  }).then((response) => {
+    if (response.status === 200) {
+      const change_success = response.data.is_success;
+      if (!change_success) {
+        alert("修改失败，请检查用户名和邮箱是否正确！" + response.data.msg);
+        return; // 终止函数执行
+      }
+      alert("修改成功！");
+      const userInfo = useUserInfo();
+      userInfo.setToken(response.data.access_token);
+      userInfo.dataFill({
+        username: change_username.value,
+        nickname: change_username.value,
+        id: userInfo.id,
+        is_superuser: userInfo.is_superuser,
+        avatar: userInfo.avatar,
+        last_login_time: userInfo.last_login_time,
+        token: response.data.access_token,
+        email: userInfo.email,
+      });
+      // this.$store.commit('auth', response.data.access_token);
+      router.go(0);
+    }
+  })
+  .catch(error => {
+    if (error.response.status === 401) {
+      console.error("数据错误：", error.response.data.detail); // 打印后端验证错误
+      alert("后端数据处理错误！");
+    }
+  });
+}
+
+const innerChangePassword = () => {
+  if (!change_old_password.value || !change_new_password.value) {
+    alert("请输入原密码和新密码！");
+    return; // 终止函数执行
+  }
+  if (change_old_password.value === change_new_password.value) {
+    alert("新密码不能与原密码相同！");
+    return; // 终止函数执行
+  }
+  if (change_new_password.value.length < 6) {
+    alert("新密码长度不能小于6位！");
+    return; // 终止函数执行
+  }
+  axios.post(getUrl() + '/account/updpwd', {
+    id: userInfo.id,
+    old_password: change_old_password.value,
+    password: change_new_password.value,
+  }).then((response) => {
+    if (response.status === 200) {
+      const change_success = response.data.is_success;
+      if (!change_success) {
+        alert("修改失败，请检查原密码是否正确！" + response.data.msg);
+        // alert("修改失败，请检查原密码是否正确！");
+        return; // 终止函数执行
+      }
+      alert("修改成功！");
+      router.go(0);
+    }
+  }).catch(error => {
+    if (error.response.status === 422) {
+      console.error("数据错误：", error.response.data.detail); // 打印后端验证错误
+      console.error("数据错误：", error.response); // 打印后端验证错误
+      alert("后端数据处理错误！");
+    }
+  });
+}
 
 const onCurrentNavMenu = (status: boolean, name: string) => {
   state.currentNavMenu = status ? name : '';
@@ -199,14 +322,21 @@ const onFullScreen = () => {
 };
 
 const onAdminInfo = () => {
-  state.showAdminInfoPopover = false;
-  routePush({ name: 'routine/adminInfo' });
+  state.showAdminInfoPopover = true;
+  userInfoDialogVisible.value = true;
+  // routePush({ name: 'routine/adminInfo' });
+};
+
+const changePassword = () => {
+  state.showAdminInfoPopover = true;
+  passwordDialogVisible.value = true;
+  // routePush({ name: 'routine/changePassword' });
 };
 
 const onLogout = () => {
   // logout().then(() => {
   Local.remove(ADMIN_INFO);
-  router.go(0);
+  router.replace("/login");
   // })
 };
 
