@@ -70,16 +70,18 @@ export const appOptButtons = (): OptButton[] => {
             click: async (row, field, baTable: baTableClass) => {
                 console.log(row);
                 console.log(baTable)
-                row.status = 'building';
+                row.app_status = 'building';
                 try {
                     ElMessage.success('Project is building...');
                     const res = await ftBuild({
+                        app_id: row.app_id,
                         path: row.app_path,
                         name: row.app_name
                     });
                     ElMessage.success(res.data?.message)
-                    row.status = 'builded';
+                    row.app_status = 'builded'
                 } catch (err: any) {
+                    row.app_status = 'unbuild'
                     ElMessage.error(err?.message)
                 }
             },
@@ -95,22 +97,24 @@ export const appOptButtons = (): OptButton[] => {
             disabledTip: false,
             click: async (row, field, baTable: baTableClass) => {
                 console.log(row);
-                row.status = 'deploying'
+                row.app_status = 'deploying'
                 try {
                     ElMessage.success('Project is deploying...');
                     const res = await ftDeploy({
+                        app_id: row.app_id,
                         path: row.app_path,
                         name: row.app_name
                     });
-                    row.status = 'deployed'
+                    row.app_status = 'deployed'
                     ElMessage.success(res.data?.message)
                 } catch (err: any) {
                     ElMessage.error(err?.message)
+                    row.app_status = 'builded'
                 }
             },
         },
         {
-            render: 'multiSelectDropdownButton',
+            render: 'tipButton',
             name: 'invoke',
             title: '调用',
             text: '',
@@ -118,53 +122,62 @@ export const appOptButtons = (): OptButton[] => {
             icon: 'fa fa-play',
             class: 'table-opt-button',
             disabledTip: false,
-            multiSelectDropdownMenu: {
-                async confirm(selected, row, field, baTable) {
-                    console.log(selected);
-                    ElMessage.success('Invoking...');
-                    // selected.forEach(async (mode) => {
-                    // const mode = 'spilot'
-                    row.app_status = 'running'
-                    try {
-                        const res1 = await ftInvoke({
-                            path: row.app_path,
-                            name: row.app_name,
-                            mode: 'baseline'
-                        });
-                        // const res2 = await ftInvoke({
-                        //     path: row.app_path,
-                        //     name: row.app_name,
-                        //     mode: 'spilot'
-                        // });
-                        ElMessage.success(res1.data?.message)
-                        // ElMessage.success(res2.data?.message)
-
-                        row.app_status = 'stopped'
-                    } catch (err: any) {
-                        ElMessage.error(err?.message)
-                    }
-                    // })
-
-                },
-                items: [
-                    {
-                        command: 'fast-start',
-                        name: '快速启动',
-                    },
-                    {
-                        command: 'network-optimize',
-                        name: '网络优化',
-                    },
-                    {
-                        command: 'consistent-storage',
-                        name: '一致存储',
-                    },
-                    {
-                        command: 'performance-isolate',
-                        name: '性能隔离',
-                    },
-                ],
+            click: async (row, field, baTable: baTableClass) => {
+                console.log(row);
+                row.app_status = 'running'
+                try {
+                    ElMessage.success('Project is running...');
+                    const res = await ftInvoke({
+                        app_id: row.app_id,
+                        path: row.app_path,
+                        name: row.app_name,
+                        mode: 'baseline'
+                    });
+                    row.app_status = 'runned'
+                    ElMessage.success(res.data?.message)
+                } catch (err: any) {
+                    ElMessage.error(err?.message)
+                    row.app_status = 'deployed'
+                }
             },
+            // multiSelectDropdownMenu: {
+            //     async confirm(selected, row, field, baTable) {
+            //         console.log(selected);
+            //         ElMessage.success('Invoking...');
+            //         row.app_status = 'running'
+            //         try {
+            //             const res1 = await ftInvoke({
+            //                 path: row.app_path,
+            //                 name: row.app_name,
+            //                 mode: 'baseline'
+            //             });
+            //             ElMessage.success(res1.data?.message)
+
+            //             row.app_status = 'stopped'
+            //         } catch (err: any) {
+            //             ElMessage.error(err?.message)
+            //         }
+
+            //     },
+            //     items: [
+            //         {
+            //             command: 'fast-start',
+            //             name: '快速启动',
+            //         },
+            //         {
+            //             command: 'network-optimize',
+            //             name: '网络优化',
+            //         },
+            //         {
+            //             command: 'consistent-storage',
+            //             name: '一致存储',
+            //         },
+            //         {
+            //             command: 'performance-isolate',
+            //             name: '性能隔离',
+            //         },
+            //     ],
+            // },
         },
         {
             render: 'tipButton',

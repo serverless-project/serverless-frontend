@@ -1,6 +1,7 @@
 import { createAxios } from '/@/utils/axios';
 
 export function ftBuild(body: {
+  app_id: number,
   path: string,
   name: string,
   filename?: string
@@ -13,6 +14,7 @@ export function ftBuild(body: {
 }
 
 export function ftDeploy(body: {
+  app_id: number,
   path: string,
   name: string,
 }) {
@@ -24,6 +26,7 @@ export function ftDeploy(body: {
 }
 
 export function ftInvoke(body: {
+  app_id: number,
   path: string,
   name: string,
   mode?: string
@@ -45,7 +48,4 @@ export function ftGetLog(body: {
     method: 'post',
     data: body
   });
-  return {
-    data: 'hello'
-  }
 }

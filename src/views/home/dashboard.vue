@@ -138,7 +138,7 @@ const baTable = new baTableClass(new baTableApi('/application/'), {
       operatorPlaceholder: t('Fuzzy query'),
       width: 150,
     },
-        {
+    {
       label: '路径',
       prop: 'app_path',
       align: 'left',
@@ -160,6 +160,7 @@ const baTable = new baTableClass(new baTableApi('/application/'), {
       custom: {
         stopped: 'danger',
         running: 'success',
+        runned: 'primary',
         starting: 'warning',
         unbuild: 'info',
         building: 'info',
@@ -174,6 +175,7 @@ const baTable = new baTableClass(new baTableApi('/application/'), {
         deploying: '部署中',
         deployed: '已部署',
         running: '运行中',
+        runned: '已运行',
         stopped: '已停止',
       },
       width: 80,
@@ -243,9 +245,11 @@ watch(
       <el-alert class="ba-table-alert" v-if="baTable.table.remark" :title="baTable.table.remark" type="info"
         show-icon />
       <!-- 表格顶部菜单 -->
-      <TableHeader style="outline: none"
+      <!-- <TableHeader style="outline: none"
         :buttons="['refresh', 'add', 'delete', 'comSearch', 'quickSearch', 'columnDisplay']"
-        quick-search-placeholder="根据应用名称进行搜索" />
+        quick-search-placeholder="根据应用名称进行搜索" /> -->
+
+      <TableHeader style="outline: none" :buttons="['refresh', 'add', 'delete', 'columnDisplay']" />
 
       <!-- 表格 -->
       <!-- 要使用`el-table`组件原有的属性，直接加在Table标签上即可 -->
