@@ -204,6 +204,71 @@ export const appOptButtons = (): OptButton[] => {
             },
         },
         {
+            render: 'dropdownButton',
+            name: 'edit',
+            title: '日志管理',
+            text: '',
+            type: 'text',
+            icon: 'fa fa-file',
+            class: 'table-opt-button',
+            disabledTip: false,
+            dropdownMenu: {
+                items: [
+                    {
+                        command: 'backup-log',
+                        name: '导出日志',
+                        click: async (row: TableRow, field: TableColumn, baTable: baTableClass) => {
+                            ElMessage.info('开始日志导出…');
+                            // To-Do export all the saved logs in redis into a local file
+                        },
+                    },
+                    {
+                        command: 'clear-log',
+                        name: '清除日志',
+                        click: async (row: TableRow, field: TableColumn, baTable: baTableClass) => {
+                            // 清除日志的逻辑
+                            ElMessage.info('正在清除日志…');
+                            // To-Do delete all the saved logs in redis
+                        },
+                    },
+                    {
+                        command: 'manage-log',
+                        name: '日志管理',
+                        click: (row: TableRow, field: TableColumn, baTable: baTableClass) => {
+                            // 跳转到日志管理页面，比如 /logs?app=<app_name>
+                            window.open(`http://47.94.80.218:5000/`, '_blank');
+                        },
+                    },
+                ],
+                handleCommand(
+                    command: string,
+                    row: TableRow,
+                    field: TableColumn,
+                    baTable: baTableClass
+                ) {
+                    const item = this.items.find((i) => i.command === command);
+                    if (item && typeof item.click === 'function') {
+                        item.click(row, field, baTable);
+                    } else {
+                        console.warn(`[dropdownButton] 未找到 command = "${command}" 对应的菜单项`);
+                    }
+                },
+            },
+        },
+        {
+            render: 'tipButton',
+            name: 'edit',
+            title: '网络监控',
+            text: '',
+            type: 'text',
+            icon: 'fa fa-image',
+            class: 'table-opt-button',
+            disabledTip: false,
+            click: async (row, field, baTable: baTableClass) => {
+                window.open(`http://47.94.80.218:8888/`, '_blank');
+            },
+        },
+        {
             render: 'tipButton',
             name: 'edit',
             title: 'Edit',
@@ -217,22 +282,22 @@ export const appOptButtons = (): OptButton[] => {
                 baTable.toggleForm('editDialog', [row.app_id]);
             }
         },
-        {
-            render: 'confirmButton',
-            name: 'delete',
-            title: 'Delete',
-            text: '',
-            type: 'text',
-            icon: 'fa fa-trash',
-            class: 'table-opt-button',
-            popconfirm: {
-                confirmButtonText: i18n.global.t('Delete'),
-                cancelButtonText: i18n.global.t('Cancel'),
-                confirmButtonType: 'danger',
-                title: '确认要删除当前应用吗？',
-            },
-            disabledTip: false,
-        },
+        // {
+        //     render: 'confirmButton',
+        //     name: 'delete',
+        //     title: 'Delete',
+        //     text: '',
+        //     type: 'text',
+        //     icon: 'fa fa-trash',
+        //     class: 'table-opt-button',
+        //     popconfirm: {
+        //         confirmButtonText: i18n.global.t('Delete'),
+        //         cancelButtonText: i18n.global.t('Cancel'),
+        //         confirmButtonType: 'danger',
+        //         title: '确认要删除当前应用吗？',
+        //     },
+        //     disabledTip: false,
+        // },
     ];
 };
 
