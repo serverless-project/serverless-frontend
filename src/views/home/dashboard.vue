@@ -15,6 +15,8 @@ import EditDialog from '/@/views/home/editDialog.vue';
 import { useUserInfo } from '/@/stores/userInfo';
 import axios from 'axios';
 import { getUrl } from '/@/utils/axios';
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { Plus } from '@element-plus/icons-vue'
 import { ElRadioGroup } from 'element-plus';
 
 defineOptions({
@@ -33,60 +35,124 @@ onActivated(() => { });
 const userInfo = useUserInfo();
 
 interface DataItem {
-  name: string
+  node_name: string
   cpu_number: number
   mem_size: number
   disk_size: number
+  applications?: string[] // 从API获取的应用信息(多个字符串)
 }
 
-// 创建响应式引用
-const nodeInfoRef = ref<{
-  data: DataItem[]
-  invalid: string[]
-}>({
-  data: [],
-  invalid: []
-})
+const nodes = ref<DataItem[]>([])
+const invaild_nodes = ref<string[]>([])
+const loading = ref(false)
+const deleting_nodename = ref<string | null>(null)
+const addNodeDialogVisible = ref(false)
+const addingNode = ref(false)
+
 
 const valid_cpu = computed(() => {
-  return nodeInfoRef.value.data
-    .filter(item => !nodeInfoRef.value.invalid.includes(item.name))
+  return nodes.value
+    .filter(item => !invaild_nodes.value.includes(item.node_name))
     .reduce((sum, item) => sum + item.cpu_number, 0)
 })
 
 const valid_mem = computed(() => {
-  return nodeInfoRef.value.data
-    .filter(item => !nodeInfoRef.value.invalid.includes(item.name))
+  return nodes.value
+    .filter(item => !invaild_nodes.value.includes(item.node_name))
     .reduce((sum, item) => sum + item.mem_size, 0)
 })
 
 const valid_disk = computed(() => {
-  return nodeInfoRef.value.data
-    .filter(item => !nodeInfoRef.value.invalid.includes(item.name))
+  return nodes.value
+    .filter(item => !invaild_nodes.value.includes(item.node_name))
     .reduce((sum, item) => sum + item.disk_size, 0)
 });
 
 const valid_node_number = computed(() => {
-  return nodeInfoRef.value.data
-    .filter(item => !nodeInfoRef.value.invalid.includes(item.name))
+  return nodes.value
+    .filter(item => !invaild_nodes.value.includes(item.node_name))
     .length;
 });
 
+const All_nodes = computed(() => nodes.value.map(node => node.node_name))
+
+const avail_nodes = computed(() =>
+  All_nodes.value.filter(name => !invaild_nodes.value.includes(name))
+)
+
 onBeforeMount(() => {
+  fetchNodes(); // 页面加载时获取节点数据
+});
+
+async function fetchNodes() {
   axios.get(getUrl() + '/profile/global').then((res) => {
     if (res.status === 200) {
       console.error(res.data);
-      nodeInfoRef.value.data = res.data.node_info || [];
-      nodeInfoRef.value.invalid = res.data.invaild_nodes || [];
+      nodes.value = res.data.node_info || [];
+      invaild_nodes.value = res.data.invaild_nodes || [];
       panelsRef.value[1].number = valid_node_number.value;
       panelsRef.value[2].number = valid_mem.value;
       panelsRef.value[3].number = valid_cpu.value;
-      panelsRef.value[4].number = valid_disk.value; // 转换为TB
+      panelsRef.value[4].number = valid_disk.value;
     }
   }).catch((err) => {
     console.error(err);
   });
-});
+}
+
+// 显示添加节点对话框
+function showAddNodeDialog() {
+  addNodeDialogVisible.value = true
+}
+
+// 添加节点
+async function addNode() {
+  try {
+    addingNode.value = true
+    const response = await fetch('/api/nodes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+
+    if (response.ok) {
+      ElMessage.success('节点添加成功')
+      addNodeDialogVisible.value = false
+      fetchNodes() // 刷新列表
+    } else {
+      throw new Error('添加失败')
+    }
+  } catch (error) {
+    ElMessage.error('添加节点失败')
+  } finally {
+    addingNode.value = false
+  }
+}
+
+// 删除节点
+async function confirmDeleteNode(node_name: string) {
+  try {
+    await ElMessageBox.confirm('确定要删除此节点吗?', '警告', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+
+    deleting_nodename.value = node_name
+    const response = axios.get(getUrl() + '/profile/remove_node/' + node_name);
+    if ((await response).status === 200) {
+      ElMessage.success('节点删除成功')
+      fetchNodes() // 刷新列表
+    }
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('删除节点失败')
+    }
+  } finally {
+    deleting_nodename.value = null
+  }
+}
 
 onUnmounted(() => { });
 
@@ -257,8 +323,8 @@ const panelControl = ref({
   availablePanels: ['table', 'panel1']
 })
 
-const getPanelLabel = (panel) => {
-  const labels = {
+const getPanelLabel = (panel: string) => {
+  const labels: Record<string, string> = {
     'table': '应用视图',
     'panel1': '资源视图'
   }
@@ -322,9 +388,9 @@ watch(
         <TableHeader style="outline: none" :buttons="['refresh', 'add', 'delete', 'columnDisplay']" />
         <Table ref="tableRef">
           <template #provider>
-            <el-table-column label="模式" width="100">
+            <el-table-column label="模式" width="140">
               <template #default="scope">
-                <el-select size="small" v-model="scope.row.app_provider" placeholder="Select">
+                <el-select size="small" v-model="scope.row.app_provider" placeholder="选择模式">
                   <el-option v-for="item in scope.row.app_providers" :key="item" :label="item" :value="item" />
                 </el-select>
               </template>
@@ -338,8 +404,64 @@ watch(
 
       <!-- 其他面板 (示例) -->
       <div v-show="userInfo.is_superuser && panelControl.currentPanel === 'panel1'">
-        <!-- 面板1内容 -->
-        这里是面板1的内容
+        <div class="node-management-panel">
+          <!-- 添加节点按钮 -->
+          <div class="panel-header">
+            <el-button type="primary" @click="showAddNodeDialog">
+              <el-icon>
+                <Plus />
+              </el-icon>
+              添加节点
+            </el-button>
+          </div>
+
+          <!-- 节点列表 -->
+          <el-table :data="nodes" style="width: 100%" v-loading="loading">
+            <el-table-column prop="node_name" label="节点名称" width="180" fixed />
+
+            <!-- 资源信息列 -->
+            <el-table-column label="资源信息">
+              <template #default="{ row }">
+                <div class="resource-info">
+                  <div>CPU: {{ row.cpu_number }} 核</div>
+                  <div>内存: {{ row.mem_size }} GB</div>
+                  <div>存储: {{ row.disk_size }} GB</div>
+                </div>
+              </template>
+            </el-table-column>
+
+            <el-table-column label="已部署应用">
+              <template #default="{ row }">
+                <div v-if="row.applications?.length" class="app-names">
+                  <div v-for="appName in row.applications" :key="appName" class="app-name-item">
+                    {{ appName }}
+                  </div>
+                </div>
+                <span v-else>无应用</span>
+              </template>
+            </el-table-column>
+
+            <!-- 操作列 -->
+            <el-table-column label="操作" width="120">
+              <template #default="{ row }">
+                <el-button type="danger" size="small" @click="confirmDeleteNode(row.node_name)"
+                  :loading="deleting_nodename === row.node_name">
+                  删除
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+
+          <!-- 添加节点对话框 -->
+          <el-dialog v-model="addNodeDialogVisible" title="添加新节点" width="30%">
+            <template #footer>
+              <el-button @click="addNodeDialogVisible = false">取消</el-button>
+              <el-button type="primary" @click="addNode" :loading="addingNode">
+                确认
+              </el-button>
+            </template>
+          </el-dialog>
+        </div>
       </div>
     </div>
   </div>
@@ -586,5 +708,22 @@ html.dark {
   padding: 10px;
   background: #f5f7fa;
   border-radius: 4px;
+}
+
+.node-management-panel {
+  padding: 20px;
+}
+
+.panel-header {
+  margin-bottom: 20px;
+}
+
+.resource-info {
+  line-height: 1.6;
+}
+
+.app-tag {
+  margin-right: 5px;
+  margin-bottom: 5px;
 }
 </style>
