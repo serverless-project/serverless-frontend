@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useTransition } from '@vueuse/core';
-import { ComputedRef, CSSProperties, onActivated, onBeforeMount, onMounted, onUnmounted, provide, Ref, ref, watch, computed } from 'vue';
+import { ComputedRef, CSSProperties, onActivated, onBeforeMount, onMounted, onUnmounted, provide, Ref, ref, watch, computed, h } from 'vue';
 import { useNavTabs } from '/@/stores/navTabs';
 import Icon from '/@/components/icon/index.vue';
 import { appOptButtons } from '/@/components/table/index';
@@ -15,7 +15,7 @@ import EditDialog from '/@/views/home/editDialog.vue';
 import { useUserInfo } from '/@/stores/userInfo';
 import axios from 'axios';
 import { getUrl } from '/@/utils/axios';
-import { convertCompilerOptionsFromJson } from 'typescript';
+import { ElRadioGroup } from 'element-plus';
 
 defineOptions({
   name: 'dashboard',
@@ -221,6 +221,12 @@ const baTable = new baTableClass(new baTableApi('/application/'), {
       width: 80,
     },
     {
+      label: '模式',
+      render: 'slot',
+      slotName: 'provider',
+      operator: 'LIKE'
+    },
+    {
       label: '操作',
       align: 'left',
       width: 300,
@@ -247,7 +253,7 @@ baTable.getIndex();
 provide('baTable', baTable);
 
 const panelControl = ref({
-  currentPanel: 'table', 
+  currentPanel: 'table',
   availablePanels: ['table', 'panel1']
 })
 
@@ -279,16 +285,12 @@ watch(
     <!-- 应用看板 -->
     <div class="small-panel-box" v-if="userInfo.is_superuser">
       <el-row :gutter="20">
-        <el-col 
-          v-for="(panel, index) in panelsRef" 
-          :key="index"
-          :style="{ 
-            flex: '1 0 auto', 
-            minWidth: '250px', 
-            maxWidth: '300px',
-            marginBottom: '20px'
-          }"
-        >
+        <el-col v-for="(panel, index) in panelsRef" :key="index" :style="{
+          flex: '1 0 auto',
+          minWidth: '250px',
+          maxWidth: '300px',
+          marginBottom: '20px'
+        }">
           <div class="small-panel user-reg suspension">
             <div class="small-panel-title">{{ panel.name }}</div>
             <div class="small-panel-content">
@@ -307,11 +309,7 @@ watch(
       <!-- 切换按钮 (仅在canSwitch为true时显示) -->
       <div class="panel-switcher" v-if="userInfo.is_superuser">
         <el-radio-group v-model="panelControl.currentPanel" size="small">
-          <el-radio-button 
-            v-for="panel in panelControl.availablePanels" 
-            :key="panel" 
-            :label="panel"
-          >
+          <el-radio-button v-for="panel in panelControl.availablePanels" :key="panel" :label="panel">
             {{ getPanelLabel(panel) }}
           </el-radio-button>
         </el-radio-group>
@@ -319,9 +317,20 @@ watch(
 
       <!-- 表格面板 -->
       <div v-show="panelControl.currentPanel === 'table' && userInfo.is_superuser">
-        <el-alert class="ba-table-alert" v-if="baTable.table.remark" :title="baTable.table.remark" type="info" show-icon />
+        <el-alert class="ba-table-alert" v-if="baTable.table.remark" :title="baTable.table.remark" type="info"
+          show-icon />
         <TableHeader style="outline: none" :buttons="['refresh', 'add', 'delete', 'columnDisplay']" />
-        <Table ref="tableRef" />
+        <Table ref="tableRef">
+          <template #provider>
+            <el-table-column label="模式" width="100">
+              <template #default="scope">
+                <el-select size="small" v-model="scope.row.app_provider" placeholder="Select">
+                  <el-option v-for="item in scope.row.app_providers" :key="item" :label="item" :value="item" />
+                </el-select>
+              </template>
+            </el-table-column>
+          </template>
+        </Table>
         <ContainerStatusDialog />
         <PopupForm />
         <EditDialog />

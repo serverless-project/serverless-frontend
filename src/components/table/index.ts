@@ -76,7 +76,8 @@ export const appOptButtons = (): OptButton[] => {
                     const res = await ftBuild({
                         app_id: row.app_id,
                         path: row.app_path,
-                        name: row.app_name
+                        name: row.app_name,
+                        provider: row.app_provider
                     });
                     ElMessage.success(res.data?.message)
                     row.app_status = 'builded'
@@ -103,7 +104,8 @@ export const appOptButtons = (): OptButton[] => {
                     const res = await ftDeploy({
                         app_id: row.app_id,
                         path: row.app_path,
-                        name: row.app_name
+                        name: row.app_name,
+                        provider: row.app_provider
                     });
                     row.app_status = 'deployed'
                     ElMessage.success(res.data?.message)
@@ -131,7 +133,8 @@ export const appOptButtons = (): OptButton[] => {
                         app_id: row.app_id,
                         path: row.app_path,
                         name: row.app_name,
-                        mode: 'baseline'
+                        mode: 'baseline',
+                        provider: row.app_provider
                     });
                     row.app_status = 'runned'
                     ElMessage.success(res.data?.message)
@@ -194,6 +197,7 @@ export const appOptButtons = (): OptButton[] => {
                         app_id: row.app_id,
                         path: row.app_path,
                         name: row.app_name,
+                        provider: row.app_provider
                     });
                     row.app_status = 'stopped'
                     ElMessage.success(res.data?.message)

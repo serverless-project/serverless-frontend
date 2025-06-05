@@ -4,7 +4,8 @@ export function ftBuild(body: {
   app_id: number,
   path: string,
   name: string,
-  filename?: string
+  filename?: string,
+  provider?: string,
 }) {
   return createAxios({
     url: '/ft/build',
@@ -17,6 +18,7 @@ export function ftDeploy(body: {
   app_id: number,
   path: string,
   name: string,
+  provider?: string,
 }) {
   return createAxios({
     url: '/ft/deploy',
@@ -29,7 +31,8 @@ export function ftInvoke(body: {
   app_id: number,
   path: string,
   name: string,
-  mode?: string
+  mode?: string,
+  provider?: string,
 }) {
   return createAxios({
     url: '/ft/invoke',
@@ -42,6 +45,7 @@ export function ftStop(body: {
   app_id: number,
   path: string,
   name: string,
+  provider?: string,
 }) {
   return createAxios({
     url: '/ft/stop',
