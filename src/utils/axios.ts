@@ -8,7 +8,7 @@ import { useUserInfo } from '/@/stores/userInfo';
  */
 export const getUrl = (): string => {
     const value: string = import.meta.env.VITE_AXIOS_BASE_URL as string
-    return (value == 'getCurrentDomain' ? window.location.protocol + '//' + window.location.host : value) + '/api/v1'
+    return (value == 'getCurrentDomain' ? window.location.protocol + '//' + window.location.host : value)
 }
 
 interface Options {

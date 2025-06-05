@@ -38,13 +38,13 @@ export function ftInvoke(body: {
   });
 }
 
-export function ftGetLog(body: {
+export function ftStop(body: {
+  app_id: number,
+  path: string,
   name: string,
-  mode?: string,
-  metric?: string
 }) {
   return createAxios({
-    url: '/ft/logs',
+    url: '/ft/stop',
     method: 'post',
     data: body
   });

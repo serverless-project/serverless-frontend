@@ -1,7 +1,7 @@
 import { ElMessage, TableColumnCtx } from 'element-plus';
 import { i18n } from '/@/lang';
 import type baTableClass from '/@/utils/baTable';
-import { ftBuild, ftDeploy, ftInvoke } from '/@/api/dashboard';
+import { ftBuild, ftDeploy, ftInvoke, ftStop } from '/@/api/dashboard';
 import router from '/@/router';
 import { cloneDeep } from 'lodash-es';
 
@@ -55,7 +55,7 @@ export const appOptButtons = (): OptButton[] => {
             click: async (row, field, baTable: baTableClass) => {
                 // TODO: 打开编辑器
                 // window.open('http://192.168.28.220/code', '_blank');
-                window.open(`http://localhost:8088/?folder=${row.app_path}`, '_blank');
+                window.open(`http://39.104.200.127:8088/?folder=${row.app_path}`, '_blank');
             },
         },
         {
@@ -140,44 +140,6 @@ export const appOptButtons = (): OptButton[] => {
                     row.app_status = 'deployed'
                 }
             },
-            // multiSelectDropdownMenu: {
-            //     async confirm(selected, row, field, baTable) {
-            //         console.log(selected);
-            //         ElMessage.success('Invoking...');
-            //         row.app_status = 'running'
-            //         try {
-            //             const res1 = await ftInvoke({
-            //                 path: row.app_path,
-            //                 name: row.app_name,
-            //                 mode: 'baseline'
-            //             });
-            //             ElMessage.success(res1.data?.message)
-
-            //             row.app_status = 'stopped'
-            //         } catch (err: any) {
-            //             ElMessage.error(err?.message)
-            //         }
-
-            //     },
-            //     items: [
-            //         {
-            //             command: 'fast-start',
-            //             name: '快速启动',
-            //         },
-            //         {
-            //             command: 'network-optimize',
-            //             name: '网络优化',
-            //         },
-            //         {
-            //             command: 'consistent-storage',
-            //             name: '一致存储',
-            //         },
-            //         {
-            //             command: 'performance-isolate',
-            //             name: '性能隔离',
-            //         },
-            //     ],
-            // },
         },
         {
             render: 'tipButton',
@@ -213,6 +175,32 @@ export const appOptButtons = (): OptButton[] => {
                 (baTable as any).ws = ws;
 
                 baTable.toggleForm('ViewContainerStatus');
+            },
+        },
+        {
+            render: 'tipButton',
+            name: 'stop',
+            title: '停止',
+            text: '',
+            type: 'text',
+            icon: 'fa fa-stop',
+            class: 'table-opt-button',
+            disabledTip: false,
+            click: async (row, field, baTable: baTableClass) => {
+                console.log(row);
+                try {
+                    ElMessage.success('Project is stopping...');
+                    const res = await ftStop({
+                        app_id: row.app_id,
+                        path: row.app_path,
+                        name: row.app_name,
+                    });
+                    row.app_status = 'stopped'
+                    ElMessage.success(res.data?.message)
+                } catch (err: any) {
+                    ElMessage.error(err?.message)
+                    row.app_status = 'deployed'
+                }
             },
         },
         {

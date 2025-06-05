@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useTransition } from '@vueuse/core';
-import { ComputedRef, CSSProperties, onActivated, onBeforeMount, onMounted, onUnmounted, provide, Ref, ref, watch } from 'vue';
+import { ComputedRef, CSSProperties, onActivated, onBeforeMount, onMounted, onUnmounted, provide, Ref, ref, watch, computed } from 'vue';
 import { useNavTabs } from '/@/stores/navTabs';
 import Icon from '/@/components/icon/index.vue';
 import { appOptButtons } from '/@/components/table/index';
@@ -30,27 +30,58 @@ const statisticValueStyle: CSSProperties = {
 
 onActivated(() => { });
 
-// const mockNumbers = [8, 5456, 9486, 875];
-
-// const initCountUp = () => {
-//   // TODO: 从后端获取数据
-//   for (let i = 0; i < panelsRef.value.length; i++) {
-//     panelsRef.value[i].number = mockNumbers[i];
-//   }
-// };
-
-// onMounted(() => {
-//   initCountUp();
-// });
-
 const userInfo = useUserInfo();
+
+interface DataItem {
+  name: string
+  cpu_number: number
+  mem_size: number
+  disk_size: number
+}
+
+// 创建响应式引用
+const nodeInfoRef = ref<{
+  data: DataItem[]
+  invalid: string[]
+}>({
+  data: [],
+  invalid: []
+})
+
+const valid_cpu = computed(() => {
+  return nodeInfoRef.value.data
+    .filter(item => !nodeInfoRef.value.invalid.includes(item.name))
+    .reduce((sum, item) => sum + item.cpu_number, 0)
+})
+
+const valid_mem = computed(() => {
+  return nodeInfoRef.value.data
+    .filter(item => !nodeInfoRef.value.invalid.includes(item.name))
+    .reduce((sum, item) => sum + item.mem_size, 0)
+})
+
+const valid_disk = computed(() => {
+  return nodeInfoRef.value.data
+    .filter(item => !nodeInfoRef.value.invalid.includes(item.name))
+    .reduce((sum, item) => sum + item.disk_size, 0)
+});
+
+const valid_node_number = computed(() => {
+  return nodeInfoRef.value.data
+    .filter(item => !nodeInfoRef.value.invalid.includes(item.name))
+    .length;
+});
 
 onBeforeMount(() => {
   axios.get(getUrl() + '/profile/global').then((res) => {
     if (res.status === 200) {
-      panelsRef.value[1].number = res.data.node_number;
-      panelsRef.value[2].number = res.data.mem_size;
-      panelsRef.value[3].number = res.data.cpu_number;
+      console.error(res.data);
+      nodeInfoRef.value.data = res.data.node_info || [];
+      nodeInfoRef.value.invalid = res.data.invaild_nodes || [];
+      panelsRef.value[1].number = valid_node_number.value;
+      panelsRef.value[2].number = valid_mem.value;
+      panelsRef.value[3].number = valid_cpu.value;
+      panelsRef.value[4].number = valid_disk.value; // 转换为TB
     }
   }).catch((err) => {
     console.error(err);
@@ -122,6 +153,15 @@ const panelsRef = ref<Panel[]>([
     },
     0,
     '核'
+  ),
+  new Panel(
+    '存储',
+    {
+      name: 'fa fa-server',
+      color: '#20B2AA',
+    },
+    0,
+    'GB'
   ),
 ]);
 
@@ -206,6 +246,19 @@ baTable.getIndex();
 
 provide('baTable', baTable);
 
+const panelControl = ref({
+  currentPanel: 'table', 
+  availablePanels: ['table', 'panel1']
+})
+
+const getPanelLabel = (panel) => {
+  const labels = {
+    'table': '应用视图',
+    'panel1': '资源视图'
+  }
+  return labels[panel] || panel
+}
+
 // 监视baTable.table.data的变化，更新
 watch(
   () => baTable.table.data,
@@ -226,7 +279,16 @@ watch(
     <!-- 应用看板 -->
     <div class="small-panel-box" v-if="userInfo.is_superuser">
       <el-row :gutter="20">
-        <el-col :sm="12" :lg="6" v-for="(panel, $index) in panelsRef" :key="$index">
+        <el-col 
+          v-for="(panel, index) in panelsRef" 
+          :key="index"
+          :style="{ 
+            flex: '1 0 auto', 
+            minWidth: '250px', 
+            maxWidth: '300px',
+            marginBottom: '20px'
+          }"
+        >
           <div class="small-panel user-reg suspension">
             <div class="small-panel-title">{{ panel.name }}</div>
             <div class="small-panel-content">
@@ -240,26 +302,36 @@ watch(
         </el-col>
       </el-row>
     </div>
-    <!-- 应用列表 -->
+
     <div class="default-main ba-table-box" style="margin: 0">
-      <el-alert class="ba-table-alert" v-if="baTable.table.remark" :title="baTable.table.remark" type="info"
-        show-icon />
-      <!-- 表格顶部菜单 -->
-      <!-- <TableHeader style="outline: none"
-        :buttons="['refresh', 'add', 'delete', 'comSearch', 'quickSearch', 'columnDisplay']"
-        quick-search-placeholder="根据应用名称进行搜索" /> -->
+      <!-- 切换按钮 (仅在canSwitch为true时显示) -->
+      <div class="panel-switcher" v-if="userInfo.is_superuser">
+        <el-radio-group v-model="panelControl.currentPanel" size="small">
+          <el-radio-button 
+            v-for="panel in panelControl.availablePanels" 
+            :key="panel" 
+            :label="panel"
+          >
+            {{ getPanelLabel(panel) }}
+          </el-radio-button>
+        </el-radio-group>
+      </div>
 
-      <TableHeader style="outline: none" :buttons="['refresh', 'add', 'delete', 'columnDisplay']" />
+      <!-- 表格面板 -->
+      <div v-show="panelControl.currentPanel === 'table' && userInfo.is_superuser">
+        <el-alert class="ba-table-alert" v-if="baTable.table.remark" :title="baTable.table.remark" type="info" show-icon />
+        <TableHeader style="outline: none" :buttons="['refresh', 'add', 'delete', 'columnDisplay']" />
+        <Table ref="tableRef" />
+        <ContainerStatusDialog />
+        <PopupForm />
+        <EditDialog />
+      </div>
 
-      <!-- 表格 -->
-      <!-- 要使用`el-table`组件原有的属性，直接加在Table标签上即可 -->
-      <Table ref="tableRef" />
-
-      <!-- 对话框 -->
-      <ContainerStatusDialog />
-      <PopupForm />
-      <EditDialog />
-
+      <!-- 其他面板 (示例) -->
+      <div v-show="userInfo.is_superuser && panelControl.currentPanel === 'panel1'">
+        <!-- 面板1内容 -->
+        这里是面板1的内容
+      </div>
     </div>
   </div>
 </template>
@@ -368,6 +440,7 @@ watch(
   border-radius: var(--el-border-radius-base);
   padding: 25px;
   margin-bottom: 20px;
+  flex-direction: column;
 
   .small-panel-title {
     color: #92969a;
@@ -497,5 +570,12 @@ html.dark {
       color: var(--el-text-color-regular);
     }
   }
+}
+
+.panel-switcher {
+  margin-bottom: 15px;
+  padding: 10px;
+  background: #f5f7fa;
+  border-radius: 4px;
 }
 </style>
