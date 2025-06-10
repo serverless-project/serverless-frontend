@@ -48,7 +48,7 @@ const loading = ref(false)
 const deleting_nodename = ref<string | null>(null)
 const addNodeDialogVisible = ref(false)
 const addingNode = ref(false)
-
+const selectedNodeName = ref('')
 
 const valid_cpu = computed(() => {
   return nodes.value
@@ -74,11 +74,10 @@ const valid_node_number = computed(() => {
     .length;
 });
 
-const All_nodes = computed(() => nodes.value.map(node => node.node_name))
-
-const avail_nodes = computed(() =>
-  All_nodes.value.filter(name => !invaild_nodes.value.includes(name))
-)
+const valid_nodes = computed(() => {
+  return nodes.value
+    .filter(item => !invaild_nodes.value.includes(item.node_name))
+});
 
 onBeforeMount(() => {
   fetchNodes(); // 页面加载时获取节点数据
@@ -92,7 +91,11 @@ async function fetchNodes() {
       invaild_nodes.value = res.data.invaild_nodes || [];
       panelsRef.value[1].number = valid_node_number.value;
       panelsRef.value[2].number = valid_mem.value;
-      panelsRef.value[3].number = valid_cpu.value;
+      panelsRef.value[3].details = 
+        {
+          cpus: { count: valid_cpu.value, unit: '核 CPU' },
+          gpus: { count: 0, unit: '个 GPU' }
+        };
       panelsRef.value[4].number = valid_disk.value;
     }
   }).catch((err) => {
@@ -100,23 +103,13 @@ async function fetchNodes() {
   });
 }
 
-// 显示添加节点对话框
-function showAddNodeDialog() {
-  addNodeDialogVisible.value = true
-}
-
 // 添加节点
-async function addNode() {
+async function addSelectedNode() {
+  if (!selectedNodeName.value) return
   try {
-    addingNode.value = true
-    const response = await fetch('/api/nodes', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    })
-
-    if (response.ok) {
+    addingNode.value = true;
+    const response = axios.get(getUrl() + '/profile/add_node/' + selectedNodeName.value);
+    if ((await response).status === 200) {
       ElMessage.success('节点添加成功')
       addNodeDialogVisible.value = false
       fetchNodes() // 刷新列表
@@ -174,12 +167,18 @@ class Panel {
   numberOutput: ComputedRef<number>;
   metric: string;
 
-  constructor(name: string, icon: { name: string; color: string }, number: number, metric: string) {
+  constructor(name: string, icon: { name: string; color: string }, number: number, metric: string,
+      public details?: {
+      cpus: { count: number; unit: string }; // 大节点数量和单位
+      gpus: { count: number; unit: string }; // 小节点数量和单位
+    }
+  ) {
     this.name = name;
     this.icon = icon;
     this.number = ref(number);
     this.numberOutput = useTransition(this.number, { duration: 1500 });
     this.metric = metric;
+    this.details = details;
   }
 }
 
@@ -205,26 +204,30 @@ const panelsRef = ref<Panel[]>([
   new Panel(
     '内存',
     {
-      name: 'fa fa-microchip',
-      color: '#4682B4',
+      name: 'fa fa-server',
+      color: '#20B2AA',
     },
     0,
     'GB'
   ),
   new Panel(
-    'CPU',
+    '计算',
     {
-      name: 'fa fa-server',
-      color: '#20B2AA',
+      name: 'fa fa-microchip',
+      color: '#20B2AA' ,
     },
     0,
-    '核'
+    'CPU',
+    {
+      cpus: { count: 0, unit: 'CPU' },
+      gpus: { count: 0, unit: 'GPU' }
+    }
   ),
   new Panel(
     '存储',
     {
       name: 'fa fa-server',
-      color: '#20B2AA',
+      color: '#6A5ACD',
     },
     0,
     'GB'
@@ -351,20 +354,47 @@ watch(
     <!-- 应用看板 -->
     <div class="small-panel-box" v-if="userInfo.is_superuser">
       <el-row :gutter="20">
-        <el-col v-for="(panel, index) in panelsRef" :key="index" :style="{
-          flex: '1 0 auto',
-          minWidth: '250px',
-          maxWidth: '300px',
-          marginBottom: '20px'
-        }">
+        <el-col
+          v-for="(panel, index) in panelsRef"
+          :key="index"
+          :style="{
+            flex: '1 0 auto',
+            minWidth: '250px',
+            maxWidth: '300px',
+            marginBottom: '20px',
+          }"
+        >
           <div class="small-panel user-reg suspension">
             <div class="small-panel-title">{{ panel.name }}</div>
             <div class="small-panel-content">
               <div class="content-left">
                 <Icon :color="panel.icon.color" size="20" :name="panel.icon.name" />
-                <el-statistic :value="panel.numberOutput" :value-style="statisticValueStyle" />
+                <template v-if="panel.details">
+                  <!-- 展示大节点和小节点 -->
+                  <div class="node-details">
+                    <div>{{ panel.details.cpus.count }} </div>
+                    <div>{{ panel.details.gpus.count }} </div>
+                  </div>
+                </template>
+                <template v-else>
+                  <!-- 默认展示总节点数 -->
+                  <el-statistic
+                    :value="panel.numberOutput"
+                    :value-style="statisticValueStyle"
+                  />
+                </template>
               </div>
-              <div class="content-right">{{ panel.metric }}</div>
+                <div class="content-right">
+                  <template v-if="panel.details">
+                    <div class="node-units">
+                      <div>{{ panel.details.cpus.unit }}</div>
+                      <div>{{ panel.details.gpus.unit }}</div>
+                    </div>
+                  </template>
+                  <template v-else>
+                    {{ panel.metric }}
+                  </template>
+                </div>
             </div>
           </div>
         </el-col>
@@ -382,7 +412,7 @@ watch(
       </div>
 
       <!-- 表格面板 -->
-      <div v-show="panelControl.currentPanel === 'table' && userInfo.is_superuser">
+      <div v-show="panelControl.currentPanel === 'table'">
         <el-alert class="ba-table-alert" v-if="baTable.table.remark" :title="baTable.table.remark" type="info"
           show-icon />
         <TableHeader style="outline: none" :buttons="['refresh', 'add', 'delete', 'columnDisplay']" />
@@ -405,25 +435,41 @@ watch(
       <!-- 其他面板 (示例) -->
       <div v-show="userInfo.is_superuser && panelControl.currentPanel === 'panel1'">
         <div class="node-management-panel">
-          <!-- 添加节点按钮 -->
+          <!-- 添加节点区域 -->
           <div class="panel-header">
-            <el-button type="primary" @click="showAddNodeDialog">
-              <el-icon>
-                <Plus />
-              </el-icon>
+            <el-select
+              v-model="selectedNodeName"
+              placeholder="选择节点名称"
+              style="width: 200px; margin-right: 10px"
+              :disabled="invaild_nodes.length === 0"
+            >
+              <el-option
+                v-for="name in invaild_nodes"
+                :key="name"
+                :label="name"
+                :value="name"
+              />
+            </el-select>
+            
+            <el-button 
+              type="primary" 
+              @click="addSelectedNode"
+              :disabled="!selectedNodeName"
+            >
+              <el-icon><Plus /></el-icon>
               添加节点
             </el-button>
           </div>
 
           <!-- 节点列表 -->
-          <el-table :data="nodes" style="width: 100%" v-loading="loading">
+          <el-table :data="valid_nodes" style="width: 100%" v-loading="loading">
             <el-table-column prop="node_name" label="节点名称" width="180" fixed />
 
             <!-- 资源信息列 -->
             <el-table-column label="资源信息">
               <template #default="{ row }">
                 <div class="resource-info">
-                  <div>CPU: {{ row.cpu_number }} 核</div>
+                  <div>计算: {{ row.cpu_number }} CPU 核</div>
                   <div>内存: {{ row.mem_size }} GB</div>
                   <div>存储: {{ row.disk_size }} GB</div>
                 </div>
@@ -452,15 +498,6 @@ watch(
             </el-table-column>
           </el-table>
 
-          <!-- 添加节点对话框 -->
-          <el-dialog v-model="addNodeDialogVisible" title="添加新节点" width="30%">
-            <template #footer>
-              <el-button @click="addNodeDialogVisible = false">取消</el-button>
-              <el-button type="primary" @click="addNode" :loading="addingNode">
-                确认
-              </el-button>
-            </template>
-          </el-dialog>
         </div>
       </div>
     </div>
@@ -588,6 +625,7 @@ watch(
       display: flex;
       align-items: center;
       font-size: 24px;
+      height: 40px; /* 固定高度 */
 
       .icon {
         margin-right: 10px;
@@ -597,6 +635,7 @@ watch(
     .content-right {
       font-size: 18px;
       margin-left: auto;
+      height: 40px; /* 固定高度 */
     }
 
     .color-success {
@@ -726,4 +765,11 @@ html.dark {
   margin-right: 5px;
   margin-bottom: 5px;
 }
+
+.node-units {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 </style>
