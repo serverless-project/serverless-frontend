@@ -128,6 +128,14 @@ const baTable = new baTableClass(new baTableApi('/data/home/app/'), {
       operatorPlaceholder: t('Fuzzy query'),
     },
     {
+      label: '模式',
+      prop: 'mode',
+      align: 'left',
+      render: 'select',
+      edit: true,
+      width: 120,
+    },
+    {
       label: t('State'),
       prop: 'status',
       align: 'left',

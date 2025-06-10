@@ -1,4 +1,4 @@
-import { ElMessage, TableColumnCtx } from 'element-plus';
+import { ElMessage, TableColumnCtx, ElMessageBox} from 'element-plus';
 import { i18n } from '/@/lang';
 import type baTableClass from '/@/utils/baTable';
 import { ftBuild, ftDeploy, ftInvoke } from '/@/api/dashboard';
@@ -55,6 +55,40 @@ export const appOptButtons = (): OptButton[] => {
                 window.open('https://www.baidu.com', '_blank');
             },
         },
+        {
+            render: 'tipButton',
+            name: 'log',
+            title: '查看日志',
+            text: '',
+            type: 'text',
+            icon: 'fa fa-file-text',
+            class: 'table-opt-button',
+            disabledTip: false,
+            click: async (row, field, baTable: baTableClass) => {
+              try {
+                // ✅ 用 Promise + setTimeout 模拟后端请求
+                const mockLog = await new Promise<string>((resolve) => {
+                  setTimeout(() => {
+                    const logText = `【Mock 日志】应用名称: ${row.name}\n运行模式: ${row.mode}\n状态: ${row.status}\n时间戳: ${row.create_time}\n\n--- 日志内容开始 ---\n[INFO] 应用已成功启动。\n[INFO] 正在监听端口 8080...\n[WARN] 网络连接不稳定。\n[ERROR] 日志测试错误。\n--- 日志内容结束 ---`;
+                    resolve(logText);
+                  }, 500); // 模拟500ms延迟
+                });
+          
+                console.log(mockLog);
+                // ✅ 展示弹窗
+                ElMessageBox({
+                    title: `应用【${row.name}】日志`,
+                    message: `<pre style="white-space: pre-wrap; word-break: break-word; max-height: 400px; overflow-y: auto;">${mockLog}</pre>`,
+                    dangerouslyUseHTMLString: true,
+                    showCancelButton: false,
+                    confirmButtonText: '关闭',
+                    customClass: 'log-dialog-box',
+                  })
+              } catch (err) {
+                // baTable.table.$message.error('日志加载失败: ' + err.message);
+              }
+            }
+        },          
         {
             render: 'tipButton',
             name: 'build',
