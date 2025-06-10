@@ -1,4 +1,4 @@
-import { createAxios } from '/@/utils/axios';
+import { createAxios, createPostAxios } from '/@/utils/axios';
 
 export function ftBuild(body: {
   path: string,
@@ -31,5 +31,12 @@ export function ftInvoke(body: {
     url: '/ft/invoke',
     method: 'post',
     data: body
+  });
+}
+
+export function ftGetLog(id: string) {
+  return createPostAxios({
+    url: '/api/exec/' + id,
+    method: 'post',
   });
 }
