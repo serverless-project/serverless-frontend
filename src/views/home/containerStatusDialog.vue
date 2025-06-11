@@ -45,10 +45,9 @@ const closeWs = () => {
 pre {
   background-color: #f5f5f5;
   color: #333;
-  padding: 10px;
   white-space: pre-wrap;
   word-wrap: break-word;
-  height: 550px;
-  overflow-y: scroll;
+  height: 470px;
+  overflow-y: auto;
 }
 </style>

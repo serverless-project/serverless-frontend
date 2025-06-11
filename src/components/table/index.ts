@@ -41,6 +41,14 @@ export const getCellValue = (row: TableRow, field: TableColumn, column: TableCol
     return cellValue;
 };
 
+const isMultiClick = (status: string) => {
+    if(status === "running" || status === "building" || status === "deploying") {
+        ElMessage.warning("请耐心等待，不要重复点击");
+        return true;
+    }
+    return false;
+}
+
 export const appOptButtons = (): OptButton[] => {
     return [
         {
@@ -68,11 +76,14 @@ export const appOptButtons = (): OptButton[] => {
             class: 'table-opt-button',
             disabledTip: false,
             click: async (row, field, baTable: baTableClass) => {
+                if(isMultiClick(row.app_status)) {
+                    return;
+                }
                 console.log(row);
                 console.log(baTable)
                 row.app_status = 'building';
                 try {
-                    ElMessage.success('Project is building...');
+                    ElMessage.success('应用构建中...');
                     const res = await ftBuild({
                         app_id: row.app_id,
                         path: row.app_path,
@@ -83,7 +94,7 @@ export const appOptButtons = (): OptButton[] => {
                     row.app_status = 'builded'
                 } catch (err: any) {
                     row.app_status = 'unbuild'
-                    ElMessage.error(err?.message)
+                    ElMessage.error(err?.message ? err?.message : 'build failed')
                 }
             },
         },
@@ -97,10 +108,17 @@ export const appOptButtons = (): OptButton[] => {
             class: 'table-opt-button',
             disabledTip: false,
             click: async (row, field, baTable: baTableClass) => {
+                if(isMultiClick(row.app_status)) {
+                    return;
+                }
+                if (row.app_status === 'unbuild') {
+                    ElMessage.error('请先构建应用');
+                    return;
+                }
                 console.log(row);
                 row.app_status = 'deploying'
                 try {
-                    ElMessage.success('Project is deploying...');
+                    ElMessage.success('应用部署中...');
                     const res = await ftDeploy({
                         app_id: row.app_id,
                         path: row.app_path,
@@ -110,7 +128,7 @@ export const appOptButtons = (): OptButton[] => {
                     row.app_status = 'deployed'
                     ElMessage.success(res.data?.message)
                 } catch (err: any) {
-                    ElMessage.error(err?.message)
+                    ElMessage.error(err?.message ? err?.message : 'deploy failed')
                     row.app_status = 'builded'
                 }
             },
@@ -125,10 +143,21 @@ export const appOptButtons = (): OptButton[] => {
             class: 'table-opt-button',
             disabledTip: false,
             click: async (row, field, baTable: baTableClass) => {
+                if(isMultiClick(row.app_status)) {
+                    return;
+                }
+                if (row.app_status === 'unbuild') {
+                    ElMessage.error('请先构建应用');
+                    return;
+                }
+                if (row.app_status === 'builded') {
+                    ElMessage.error('请先部署应用');
+                    return;
+                }
                 console.log(row);
                 row.app_status = 'running'
                 try {
-                    ElMessage.success('Project is running...');
+                    ElMessage.success('应用运行中...');
                     const res = await ftInvoke({
                         app_id: row.app_id,
                         path: row.app_path,
@@ -139,7 +168,7 @@ export const appOptButtons = (): OptButton[] => {
                     row.app_status = 'runned'
                     ElMessage.success(res.data?.message)
                 } catch (err: any) {
-                    ElMessage.error(err?.message)
+                    ElMessage.error(err?.message ? err?.message : 'invoke failed')
                     row.app_status = 'deployed'
                 }
             },
@@ -183,23 +212,27 @@ export const appOptButtons = (): OptButton[] => {
         {
             render: 'tipButton',
             name: 'stop',
-            title: '停止',
+            title: '终止（卸载）',
             text: '',
             type: 'text',
             icon: 'fa fa-stop',
             class: 'table-opt-button',
             disabledTip: false,
             click: async (row, field, baTable: baTableClass) => {
+                if (row.app_status !== 'deployed' && row.app_status !== 'runned') {
+                    ElMessage.error('“已部署”或“已运行”的应用才能被终止');
+                    return;
+                }
                 console.log(row);
                 try {
-                    ElMessage.success('Project is stopping...');
+                    ElMessage.success('应用终止中...');
                     const res = await ftStop({
                         app_id: row.app_id,
                         path: row.app_path,
                         name: row.app_name,
                         provider: row.app_provider
                     });
-                    row.app_status = 'stopped'
+                    row.app_status = 'builded'
                     ElMessage.success(res.data?.message)
                 } catch (err: any) {
                     ElMessage.error(err?.message)

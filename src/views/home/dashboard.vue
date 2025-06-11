@@ -91,11 +91,12 @@ async function fetchNodes() {
       invaild_nodes.value = res.data.invaild_nodes || [];
       panelsRef.value[1].number = valid_node_number.value;
       panelsRef.value[2].number = valid_mem.value;
-      panelsRef.value[3].details = 
-        {
-          cpus: { count: valid_cpu.value, unit: '核 CPU' },
-          gpus: { count: 0, unit: '个 GPU' }
-        };
+      // panelsRef.value[3].details = 
+      //   {
+      //     cpus: { count: valid_cpu.value, unit: '核 CPU' },
+      //     gpus: { count: 0, unit: '个 GPU' }
+      //   };
+      panelsRef.value[3].number = valid_cpu.value;
       panelsRef.value[4].number = valid_disk.value;
     }
   }).catch((err) => {
@@ -218,10 +219,10 @@ const panelsRef = ref<Panel[]>([
     },
     0,
     'CPU',
-    {
-      cpus: { count: 0, unit: 'CPU' },
-      gpus: { count: 0, unit: 'GPU' }
-    }
+    // {
+    //   cpus: { count: 0, unit: 'CPU' },
+    //   gpus: { count: 0, unit: 'GPU' }
+    // }
   ),
   new Panel(
     '存储',
@@ -267,10 +268,8 @@ const baTable = new baTableClass(new baTableApi('/application/'), {
       align: 'left',
       render: 'tag',
       custom: {
-        stopped: 'danger',
         running: 'success',
         runned: 'primary',
-        starting: 'warning',
         unbuild: 'info',
         building: 'info',
         builded: 'success',
@@ -285,7 +284,6 @@ const baTable = new baTableClass(new baTableApi('/application/'), {
         deployed: '已部署',
         running: '运行中',
         runned: '已运行',
-        stopped: '已停止',
       },
       width: 80,
     },
@@ -339,7 +337,7 @@ watch(
   () => baTable.table.data,
   (newData, oldData) => {
     const totalApps = newData?.length || 0;
-    const deployedApps = newData?.filter((app) => app.status === 'stopped' || app.status === 'deployed' || app.status === 'running').length || 0;
+    const deployedApps = newData?.filter((app) => app.app_status === 'runned' || app.app_status === 'deployed' || app_app.status === 'running').length || 0;
     panelsRef.value[0].number = totalApps;
     panelsRef.value[0].metric = `${deployedApps}/${totalApps}`;
   },
