@@ -337,7 +337,7 @@ watch(
   () => baTable.table.data,
   (newData, oldData) => {
     const totalApps = newData?.length || 0;
-    const deployedApps = newData?.filter((app) => app.app_status === 'runned' || app.app_status === 'deployed' || app_app.status === 'running').length || 0;
+    const deployedApps = newData?.filter((app) => app?.app_status === 'runned' || app?.app_status === 'deployed' || app?.app_status === 'running').length || 0;
     panelsRef.value[0].number = totalApps;
     panelsRef.value[0].metric = `${deployedApps}/${totalApps}`;
   },
