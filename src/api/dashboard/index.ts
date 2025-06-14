@@ -40,3 +40,31 @@ export function ftGetLog(id: string) {
     method: 'post',
   });
 }
+
+export function ftGetPassword(id: string) {
+  return createPostAxios({
+    url: '/api/password/' + id,
+    method: 'post',
+  });
+}
+
+export function ftGetProcess(id: string) {
+  return createPostAxios({
+    url: '/api/syscall/' + id,
+    method: 'post',
+  });
+}
+
+export function ftPerformance() {
+  return createPostAxios({
+    url: '/static/api/esolation/pwgen.json',
+    method: 'get',
+  });
+}
+
+export function ftPwgen() {
+  return createPostAxios({
+    url: '/api/button/pwgen',
+    method: 'post',
+  });
+}

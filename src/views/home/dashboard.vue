@@ -132,8 +132,7 @@ const baTable = new baTableClass(new baTableApi('/data/home/app/'), {
       prop: 'mode',
       align: 'left',
       render: 'select',
-      edit: true,
-      width: 120,
+      width: 130,
     },
     {
       label: t('State'),
@@ -444,5 +443,12 @@ html.dark {
       color: var(--el-text-color-regular);
     }
   }
+
+  /* 加在全局样式里，例如 main.css 或 App.vue 中 */
+.log-dialog-box {
+  max-width: 90vw;
+  width: 1800px;
+}
+
 }
 </style>
