@@ -252,14 +252,6 @@ export const appOptButtons = (): OptButton[] => {
             dropdownMenu: {
                 items: [
                     {
-                        command: 'backup-log',
-                        name: '导出日志',
-                        click: async (row: TableRow, field: TableColumn, baTable: baTableClass) => {
-                            ElMessage.info('开始日志导出…');
-                            // To-Do export all the saved logs in redis into a local file
-                        },
-                    },
-                    {
                         command: 'clear-log',
                         name: '清除日志',
                         click: async (row: TableRow, field: TableColumn, baTable: baTableClass) => {
@@ -273,7 +265,7 @@ export const appOptButtons = (): OptButton[] => {
                         name: '日志管理',
                         click: (row: TableRow, field: TableColumn, baTable: baTableClass) => {
                             // 跳转到日志管理页面，比如 /logs?app=<app_name>
-                            window.open(`http://47.94.80.218:5000/`, '_blank');
+                            window.open(`http://39.104.200.127:8889`, '_blank');
                         },
                     },
                 ],
@@ -290,19 +282,6 @@ export const appOptButtons = (): OptButton[] => {
                         console.warn(`[dropdownButton] 未找到 command = "${command}" 对应的菜单项`);
                     }
                 },
-            },
-        },
-        {
-            render: 'tipButton',
-            name: 'edit',
-            title: '网络监控',
-            text: '',
-            type: 'text',
-            icon: 'fa fa-image',
-            class: 'table-opt-button',
-            disabledTip: false,
-            click: async (row, field, baTable: baTableClass) => {
-                window.open(`http://47.94.80.218:8888/`, '_blank');
             },
         },
         {
