@@ -128,6 +128,13 @@ const baTable = new baTableClass(new baTableApi('/data/home/app/'), {
       operatorPlaceholder: t('Fuzzy query'),
     },
     {
+      label: '模式',
+      prop: 'mode',
+      align: 'left',
+      render: 'select',
+      width: 130,
+    },
+    {
       label: t('State'),
       prop: 'status',
       align: 'left',
@@ -436,5 +443,12 @@ html.dark {
       color: var(--el-text-color-regular);
     }
   }
+
+  /* 加在全局样式里，例如 main.css 或 App.vue 中 */
+.log-dialog-box {
+  max-width: 90vw;
+  width: 1800px;
+}
+
 }
 </style>

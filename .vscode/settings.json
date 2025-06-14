@@ -1,0 +1,8 @@
+{
+    "files.watcherExclude": {
+        "**/node_modules": true
+    },
+    "typescript.tsserver.maxTsServerMemory": 4096,
+    "typescript.disableAutomaticTypeAcquisition": true,
+    "typescript.validate.enable": true
+}

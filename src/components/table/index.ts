@@ -1,7 +1,9 @@
-import { ElMessage, TableColumnCtx } from 'element-plus';
+import { ElMessage, TableColumnCtx, ElMessageBox} from 'element-plus';
 import { i18n } from '/@/lang';
 import type baTableClass from '/@/utils/baTable';
-import { ftBuild, ftDeploy, ftInvoke } from '/@/api/dashboard';
+import { ftBuild, ftDeploy, ftInvoke, ftGetLog, ftGetPassword, ftGetProcess} from '/@/api/dashboard';
+import { errorMessages } from 'vue/compiler-sfc';
+import { log } from 'console';
 
 /**
  * 获取单元格值
@@ -57,28 +59,127 @@ export const appOptButtons = (): OptButton[] => {
         },
         {
             render: 'tipButton',
-            name: 'build',
-            title: '构建',
+            name: 'log',
+            title: '查看日志',
+            text: '',
+            type: 'text',
+            icon: 'fa fa-file-text',
+            class: 'table-opt-button',
+            disabledTip: false,
+            click: async (row, field, baTable: baTableClass) => {
+                try {
+                    const response = await ftGetLog(row.id); 
+                    const logText = response?.data?.output || '日志内容为空'; // 根据后端返回结构调整这一行
+                
+                    // ✅ 展示弹窗
+                    ElMessageBox({
+                      title: `应用【${row.name}】日志`,
+                      message: `<pre style="white-space: pre-wrap; word-break: break-word; max-height: 400px; overflow-y: auto;">${logText}</pre>`,
+                      dangerouslyUseHTMLString: true,
+                      showCancelButton: false,
+                      confirmButtonText: '关闭',
+                      customClass: 'log-dialog-box',
+                    });
+                  } catch (err: any) {
+                    ElMessage.error('日志加载失败: ' + (err?.message || err));
+                  }
+                }
+              
+        },
+        {
+            render: 'tipButton',
+            name: 'access priority',
+            title: '访问权限',
+            text: '',
+            type: 'text',
+            icon: 'fa fa-lock',
+            class: 'table-opt-button',
+            disabledTip: false,
+            click: async (row, field, baTable: baTableClass) => {
+                try {
+                  const response = await ftGetPassword(row.id); 
+                  const logText = response?.data?.output || '访问权限内容为空'; // 根据后端返回结构调整这一行
+              
+                  console.log(response);
+                  // ✅ 展示弹窗
+                  ElMessageBox({
+                    title: `应用:【${row.name}】密码`,
+                    message: `<pre style="white-space: pre-wrap; word-break: break-word; max-height: 600px; overflow-y: auto;">${logText}</pre>`,
+                    dangerouslyUseHTMLString: true,
+                    showCancelButton: false,
+                    confirmButtonText: '关闭',
+                    customClass: 'log-dialog-box',
+                  });
+                } catch (err: any) {
+                  ElMessage.error('密码加载失败: ' + (err?.message || err));
+                }
+              }
+        },   
+        {
+            render: 'tipButton',
+            name: 'syscall',
+            title: '系统调用',
             text: '',
             type: 'text',
             icon: 'fa fa-wrench',
             class: 'table-opt-button',
             disabledTip: false,
             click: async (row, field, baTable: baTableClass) => {
-                console.log(row);
-                // TODO: 封装以下try-catch过程
-                // TODO: 修改参数
                 try {
-                    const res = await ftBuild({
-                        path: '123',
-                        name: '123'
-                    });
-                    ElMessage.success(res.data?.message)
+                  const response = await ftGetProcess(row.id); 
+                  const logText = response?.data?.output || '进程号内容为空'; // 根据后端返回结构调整这一行
+              
+                  console.log(response);
+                  // ✅ 展示弹窗
+                  ElMessageBox({
+                    title: `应用:【${row.name}】进程号`,
+                    message: `<pre style="white-space: pre-wrap; word-break: break-word; max-height: 600px; overflow-y: auto;">${logText}</pre>`,
+                    dangerouslyUseHTMLString: true,
+                    showCancelButton: false,
+                    confirmButtonText: '关闭',
+                    customClass: 'log-dialog-box',
+                  });
                 } catch (err: any) {
-                    ElMessage.error(err?.message)
+                  ElMessage.error('进程号加载失败: ' + (err?.message || err));
                 }
-            },
+              }
         },
+        {
+            render: 'tipButton',
+            name: 'performance',
+            title: '性能演示',
+            text: '',
+            type: 'text',
+            icon: 'fa fa-paper-plane',
+            class: 'table-opt-button',
+            disabledTip: false,
+            click: async (row, field, baTable: baTableClass) => {
+              }
+        },
+        // {
+        //     render: 'tipButton',
+        //     name: 'build',
+        //     title: '构建',
+        //     text: '',
+        //     type: 'text',
+        //     icon: 'fa fa-wrench',
+        //     class: 'table-opt-button',
+        //     disabledTip: false,
+        //     click: async (row, field, baTable: baTableClass) => {
+        //         console.log(row);
+        //         // TODO: 封装以下try-catch过程
+        //         // TODO: 修改参数
+        //         try {
+        //             const res = await ftBuild({
+        //                 path: '123',
+        //                 name: '123'
+        //             });
+        //             ElMessage.success(res.data?.message)
+        //         } catch (err: any) {
+        //             ElMessage.error(err?.message)
+        //         }
+        //     },
+        // },
         {
             render: 'tipButton',
             name: 'deploy',
@@ -102,59 +203,59 @@ export const appOptButtons = (): OptButton[] => {
                 }
             },
         },
-        {
-            render: 'dropdownButton',
-            name: 'invoke',
-            title: '调用',
-            text: '',
-            type: 'text',
-            icon: 'fa fa-paper-plane',
-            class: 'table-opt-button',
-            disabledTip: false,
-            dropdownMenu: {
-                async handleCommand(command, row, field, baTable) {
-                    // 根据 command 进行不同方式的调用
-                    console.log(command); // basic / fast-start
-                    if (command === 'basic') {
-                        console.log(row);
-                        // TODO: 修改参数
-                        try {
-                            const res = await ftInvoke({
-                                path: '123',
-                                name: '123'
-                            });
-                            ElMessage.success(res.data?.message)
-                        } catch (err: any) {
-                            ElMessage.error(err?.message)
-                        }
-                    }
-                },
-                items: [
-                    {
-                        command: 'basic',
-                        name: '普通调用',
-                    },
-                    {
-                        command: 'fast-start',
-                        name: '快速启动',
-                    },
-                ],
-            },
-        },
-        {
-            render: 'tipButton',
-            name: 'dag',
-            title: 'DAG',
-            text: '',
-            type: 'text',
-            icon: 'fa fa-share-alt',
-            class: 'table-opt-button',
-            disabledTip: false,
-            click(row, field) {
-                console.log(row.id);
-                console.log(field);
-            },
-        },
+        // {
+        //     render: 'dropdownButton',
+        //     name: 'invoke',
+        //     title: '调用',
+        //     text: '',
+        //     type: 'text',
+        //     icon: 'fa fa-paper-plane',
+        //     class: 'table-opt-button',
+        //     disabledTip: false,
+        //     dropdownMenu: {
+        //         async handleCommand(command, row, field, baTable) {
+        //             // 根据 command 进行不同方式的调用
+        //             console.log(command); // basic / fast-start
+        //             if (command === 'basic') {
+        //                 console.log(row);
+        //                 // TODO: 修改参数
+        //                 try {
+        //                     const res = await ftInvoke({
+        //                         path: '123',
+        //                         name: '123'
+        //                     });
+        //                     ElMessage.success(res.data?.message)
+        //                 } catch (err: any) {
+        //                     ElMessage.error(err?.message)
+        //                 }
+        //             }
+        //         },
+        //         items: [
+        //             {
+        //                 command: 'basic',
+        //                 name: '普通调用',
+        //             },
+        //             {
+        //                 command: 'fast-start',
+        //                 name: '快速启动',
+        //             },
+        //         ],
+        //     },
+        // },
+        // {
+        //     render: 'tipButton',
+        //     name: 'dag',
+        //     title: 'DAG',
+        //     text: '',
+        //     type: 'text',
+        //     icon: 'fa fa-share-alt',
+        //     class: 'table-opt-button',
+        //     disabledTip: false,
+        //     click(row, field) {
+        //         console.log(row.id);
+        //         console.log(field);
+        //     },
+        // },
         {
             render: 'tipButton',
             name: 'status',
@@ -278,3 +379,5 @@ export const findIndexRow = (data: TableRow[], findIdx: number, keyIndex: number
 };
 
 type DefaultOptButType = 'weigh-sort' | 'edit' | 'delete';
+
+
