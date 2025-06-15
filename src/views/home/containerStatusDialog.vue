@@ -34,7 +34,7 @@ const closeWs = () => {
     :model-value="['ViewContainerStatus'].includes(baTable.form.operate!)"
     @close="() => { closeWs(); baTable.toggleForm(); }">
     <template #header>
-      <div class="title" v-drag="['.ba-operate-dialog', '.el-dialog__header']" v-zoom="'.ba-operate-dialog'">状态-调用日志
+      <div class="title" v-drag="['.ba-operate-dialog', '.el-dialog__header']" v-zoom="'.ba-operate-dialog'">调用日志
       </div>
     </template>
     <pre v-html="highlightedLog"></pre>

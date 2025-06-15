@@ -246,7 +246,7 @@ const baTable = new baTableClass(new baTableApi('/application/'), {
       align: 'left',
       operator: 'LIKE',
       operatorPlaceholder: t('Fuzzy query'),
-      width: 150,
+      width: 120,
     },
     {
       label: '路径',
@@ -296,7 +296,7 @@ const baTable = new baTableClass(new baTableApi('/application/'), {
     {
       label: '操作',
       align: 'left',
-      width: 300,
+      width: 250,
       render: 'buttons',
       buttons: appOptButtons(),
       operator: false,
@@ -532,6 +532,11 @@ watch(
     font-size: 15px;
     color: var(--el-text-color-primary);
   }
+}
+
+.log-dialog-box {
+  max-width: 90vw;
+  width: 1800px;
 }
 
 .working {

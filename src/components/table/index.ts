@@ -1,9 +1,13 @@
-import { ElMessage, TableColumnCtx } from 'element-plus';
+import { ElMessage, ElMessageBox, TableColumnCtx } from 'element-plus';
 import { i18n } from '/@/lang';
 import type baTableClass from '/@/utils/baTable';
-import { ftBuild, ftDeploy, ftInvoke, ftStop } from '/@/api/dashboard';
+import { ftBuild, ftDeploy, ftGetLog, ftGetPassword, ftGetProcess, ftInvoke, ftStop } from '/@/api/dashboard';
 import router from '/@/router';
 import { cloneDeep } from 'lodash-es';
+
+const isDeployed = (status: string) => {
+    return status === 'deployed' || status === 'running' || status === 'runned'
+}
 
 /**
  * 获取单元格值
@@ -42,7 +46,7 @@ export const getCellValue = (row: TableRow, field: TableColumn, column: TableCol
 };
 
 const isMultiClick = (status: string) => {
-    if(status === "running" || status === "building" || status === "deploying") {
+    if (status === "running" || status === "building" || status === "deploying") {
         ElMessage.warning("请耐心等待，不要重复点击");
         return true;
     }
@@ -76,7 +80,7 @@ export const appOptButtons = (): OptButton[] => {
             class: 'table-opt-button',
             disabledTip: false,
             click: async (row, field, baTable: baTableClass) => {
-                if(isMultiClick(row.app_status)) {
+                if (isMultiClick(row.app_status)) {
                     return;
                 }
                 console.log(row);
@@ -91,7 +95,7 @@ export const appOptButtons = (): OptButton[] => {
                         provider: row.app_provider
                     });
                     ElMessage.success(res.data?.message)
-                    row.app_status = 'builded'
+                    baTable.onTableHeaderAction('refresh', {})
                 } catch (err: any) {
                     row.app_status = 'unbuild'
                     ElMessage.error(err?.message ? err?.message : 'build failed')
@@ -107,8 +111,11 @@ export const appOptButtons = (): OptButton[] => {
             icon: 'fa fa-cloud-upload',
             class: 'table-opt-button',
             disabledTip: false,
+            display: (row: TableRow, field: TableColumn) => {
+                return !isDeployed(row?.app_status)
+            },
             click: async (row, field, baTable: baTableClass) => {
-                if(isMultiClick(row.app_status)) {
+                if (isMultiClick(row.app_status)) {
                     return;
                 }
                 if (row.app_status === 'unbuild') {
@@ -125,11 +132,45 @@ export const appOptButtons = (): OptButton[] => {
                         name: row.app_name,
                         provider: row.app_provider
                     });
-                    row.app_status = 'deployed'
                     ElMessage.success(res.data?.message)
+                    baTable.onTableHeaderAction('refresh', {})
                 } catch (err: any) {
                     ElMessage.error(err?.message ? err?.message : 'deploy failed')
                     row.app_status = 'builded'
+                }
+            },
+        },
+        {
+            render: 'tipButton',
+            name: 'stop',
+            title: '终止（卸载）',
+            text: '',
+            type: 'text',
+            icon: 'fa fa-stop',
+            class: 'table-opt-button',
+            disabledTip: false,
+            display: (row: TableRow, field: TableColumn) => {
+                return isDeployed(row?.app_status)
+            },
+            click: async (row, field, baTable: baTableClass) => {
+                if (row.app_status !== 'deployed' && row.app_status !== 'runned') {
+                    ElMessage.error('“已部署”或“已运行”的应用才能被终止');
+                    return;
+                }
+                console.log(row);
+                try {
+                    ElMessage.success('应用终止中...');
+                    const res = await ftStop({
+                        app_id: row.app_id,
+                        path: row.app_path,
+                        name: row.app_name,
+                        provider: row.app_provider
+                    });
+                    baTable.onTableHeaderAction('refresh', {})
+                    ElMessage.success(res.data?.message)
+                } catch (err: any) {
+                    ElMessage.error(err?.message)
+                    row.app_status = 'deployed'
                 }
             },
         },
@@ -143,7 +184,7 @@ export const appOptButtons = (): OptButton[] => {
             class: 'table-opt-button',
             disabledTip: false,
             click: async (row, field, baTable: baTableClass) => {
-                if(isMultiClick(row.app_status)) {
+                if (isMultiClick(row.app_status)) {
                     return;
                 }
                 if (row.app_status === 'unbuild') {
@@ -173,73 +214,42 @@ export const appOptButtons = (): OptButton[] => {
                 }
             },
         },
-        {
-            render: 'tipButton',
-            name: 'status',
-            title: '状态',
-            text: '',
-            type: 'text',
-            icon: 'fa fa-info-circle',
-            class: 'table-opt-button',
-            disabledTip: false,
-            click: (row, field, baTable) => {
+        // {
+        //     render: 'tipButton',
+        //     name: 'status',
+        //     title: '状态',
+        //     text: '',
+        //     type: 'text',
+        //     icon: 'fa fa-info-circle',
+        //     class: 'table-opt-button',
+        //     disabledTip: false,
+        //     click: (row, field, baTable) => {
 
-                // 建立 WebSocket 长连接
-                let wsBaseUrl = import.meta.env.VITE_AXIOS_BASE_URL.replace('http', 'ws').replace('localhost', '127.0.0.1');
-                const ws = new WebSocket(`${wsBaseUrl}/ft/ws/logs/${row.app_name}`);
+        //         // 建立 WebSocket 长连接
+        //         let wsBaseUrl = import.meta.env.VITE_AXIOS_BASE_URL.replace('http', 'ws').replace('localhost', '127.0.0.1');
+        //         const ws = new WebSocket(`${wsBaseUrl}/ft/ws/logs/${row.app_name}`);
 
-                ws.onopen = () => {
-                    console.log("WebSocket connected");
-                };
+        //         ws.onopen = () => {
+        //             console.log("WebSocket connected");
+        //         };
 
-                ws.onmessage = (event) => {
-                    const logData = event.data;
-                    baTable.form.items = {
-                        status: logData,
-                    };
-                };
+        //         ws.onmessage = (event) => {
+        //             const logData = event.data;
+        //             baTable.form.items = {
+        //                 status: logData,
+        //             };
+        //         };
 
-                ws.onclose = () => {
-                    console.log("WebSocket disconnected");
-                };
+        //         ws.onclose = () => {
+        //             console.log("WebSocket disconnected");
+        //         };
 
-                // 保存 ws 实例以便关闭（例如表单关闭的时候）
-                (baTable as any).ws = ws;
+        //         // 保存 ws 实例以便关闭（例如表单关闭的时候）
+        //         (baTable as any).ws = ws;
 
-                baTable.toggleForm('ViewContainerStatus');
-            },
-        },
-        {
-            render: 'tipButton',
-            name: 'stop',
-            title: '终止（卸载）',
-            text: '',
-            type: 'text',
-            icon: 'fa fa-stop',
-            class: 'table-opt-button',
-            disabledTip: false,
-            click: async (row, field, baTable: baTableClass) => {
-                if (row.app_status !== 'deployed' && row.app_status !== 'runned') {
-                    ElMessage.error('“已部署”或“已运行”的应用才能被终止');
-                    return;
-                }
-                console.log(row);
-                try {
-                    ElMessage.success('应用终止中...');
-                    const res = await ftStop({
-                        app_id: row.app_id,
-                        path: row.app_path,
-                        name: row.app_name,
-                        provider: row.app_provider
-                    });
-                    row.app_status = 'builded'
-                    ElMessage.success(res.data?.message)
-                } catch (err: any) {
-                    ElMessage.error(err?.message)
-                    row.app_status = 'deployed'
-                }
-            },
-        },
+        //         baTable.toggleForm('ViewContainerStatus');
+        //     },
+        // },
         {
             render: 'dropdownButton',
             name: 'edit',
@@ -251,6 +261,36 @@ export const appOptButtons = (): OptButton[] => {
             disabledTip: false,
             dropdownMenu: {
                 items: [
+                    {
+                        command: 'show-log',
+                        name: '查看日志',
+                        click: (row, field, baTable) => {
+
+                            // 建立 WebSocket 长连接
+                            let wsBaseUrl = import.meta.env.VITE_AXIOS_BASE_URL.replace('http', 'ws').replace('localhost', '127.0.0.1');
+                            const ws = new WebSocket(`${wsBaseUrl}/ft/ws/logs/${row.app_name}`);
+
+                            ws.onopen = () => {
+                                console.log("WebSocket connected");
+                            };
+
+                            ws.onmessage = (event) => {
+                                const logData = event.data;
+                                baTable.form.items = {
+                                    status: logData,
+                                };
+                            };
+
+                            ws.onclose = () => {
+                                console.log("WebSocket disconnected");
+                            };
+
+                            // 保存 ws 实例以便关闭（例如表单关闭的时候）
+                            (baTable as any).ws = ws;
+
+                            baTable.toggleForm('ViewContainerStatus');
+                        },
+                    },
                     {
                         command: 'clear-log',
                         name: '清除日志',
@@ -283,6 +323,104 @@ export const appOptButtons = (): OptButton[] => {
                     }
                 },
             },
+        },
+        // {
+        //     render: 'tipButton',
+        //     name: 'log',
+        //     title: '查看日志',
+        //     text: '',
+        //     type: 'text',
+        //     icon: 'fa fa-file-text',
+        //     class: 'table-opt-button',
+        //     disabledTip: false,
+        //     click: async (row, field, baTable: baTableClass) => {
+        //         try {
+        //             const response = await ftGetLog(row.app_id);
+        //             const logText = response?.data?.output || '日志内容为空'; // 根据后端返回结构调整这一行
+
+        //             // ✅ 展示弹窗
+        //             ElMessageBox({
+        //                 title: `应用【${row.app_name}】日志`,
+        //                 message: `<pre style="white-space: pre-wrap; word-break: break-word; max-height: 400px; overflow-y: auto;">${logText}</pre>`,
+        //                 dangerouslyUseHTMLString: true,
+        //                 showCancelButton: false,
+        //                 confirmButtonText: '关闭',
+        //                 customClass: 'log-dialog-box',
+        //             });
+        //         } catch (err: any) {
+        //             ElMessage.error('日志加载失败: ' + (err?.message || err));
+        //         }
+        //     }
+        // },
+        {
+            render: 'tipButton',
+            name: 'access priority',
+            title: '访问权限',
+            text: '',
+            type: 'text',
+            icon: 'fa fa-lock',
+            class: 'table-opt-button',
+            disabledTip: false,
+            click: async (row, field, baTable: baTableClass) => {
+                try {
+                    const response = await ftGetPassword(row.app_id);
+                    const logText = response?.data?.output || '访问权限内容为空'; // 根据后端返回结构调整这一行
+
+                    console.log(response);
+                    // ✅ 展示弹窗
+                    ElMessageBox({
+                        title: `应用:【${row.app_name}】密码`,
+                        message: `<pre style="white-space: pre-wrap; word-break: break-word; max-height: 600px; overflow-y: auto;">${logText}</pre>`,
+                        dangerouslyUseHTMLString: true,
+                        showCancelButton: false,
+                        confirmButtonText: '关闭',
+                        customClass: 'log-dialog-box',
+                    });
+                } catch (err: any) {
+                    ElMessage.error('密码加载失败: ' + (err?.message || err));
+                }
+            }
+        },
+        // {
+        //     render: 'tipButton',
+        //     name: 'syscall',
+        //     title: '系统调用',
+        //     text: '',
+        //     type: 'text',
+        //     icon: 'fa fa-wrench',
+        //     class: 'table-opt-button',
+        //     disabledTip: false,
+        //     click: async (row, field, baTable: baTableClass) => {
+        //         try {
+        //             const response = await ftGetProcess(row.app_id);
+        //             const logText = response?.data?.output || '进程号内容为空'; // 根据后端返回结构调整这一行
+
+        //             console.log(response);
+        //             // ✅ 展示弹窗
+        //             ElMessageBox({
+        //                 title: `应用:【${row.app_name}】进程号`,
+        //                 message: `<pre style="white-space: pre-wrap; word-break: break-word; max-height: 600px; overflow-y: auto;">${logText}</pre>`,
+        //                 dangerouslyUseHTMLString: true,
+        //                 showCancelButton: false,
+        //                 confirmButtonText: '关闭',
+        //                 customClass: 'log-dialog-box',
+        //             });
+        //         } catch (err: any) {
+        //             ElMessage.error('进程号加载失败: ' + (err?.message || err));
+        //         }
+        //     }
+        // },
+        {
+            render: 'tipButton',
+            name: 'performance',
+            title: '性能演示',
+            text: '',
+            type: 'text',
+            icon: 'fa fa-paper-plane',
+            class: 'table-opt-button',
+            disabledTip: false,
+            click: async (row, field, baTable: baTableClass) => {
+            }
         },
         {
             render: 'tipButton',

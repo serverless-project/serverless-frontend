@@ -9,6 +9,7 @@ type tableRenderer =
     | 'image'
     | 'images'
     | 'switch'
+    | 'select'
     | 'tag'
     | 'tags'
     | 'url'

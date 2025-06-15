@@ -45,3 +45,20 @@ export function createAxios<Data = any, T = ApiPromise<Data>>(
     // TODO: 为 axios 添加自定义配置
     return axiosInstance(axiosConfig) as T;
 }
+
+export function createPostAxios<Data = any, T = ApiPromise<Data>>(
+    axiosConfig: AxiosRequestConfig,
+    options: Options = {},
+    loading: LoadingOptions = {},
+    mock: boolean = false,
+): T {
+    const axiosInstance = axios.create({
+        // baseURL: mock ? window.location.protocol + '//' + window.location.host : getUrl(),
+        baseURL: 'http://39.99.46.119',
+        timeout: 1000 * 10,
+        headers: {},
+        responseType: 'json',
+    });
+    // TODO: 为 axios 添加自定义配置
+    return axiosInstance(axiosConfig) as T;
+}
