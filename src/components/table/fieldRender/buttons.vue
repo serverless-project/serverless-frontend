@@ -142,9 +142,11 @@ const openChartDialog = async () => {
       { label: 'vkernel', value: data[1] || 0 },
     ];
 
-    showDialog.value = true;
+    const result = ((data[1] - data[0]) / data[0]) * 100;
+    showDialog.value = false;
+    console.log(`性能演示结果-----gvisor: {${data[0]}}ms, vkernel: {${data[1]}}ms Pwgen: {${(result ?? 0).toFixed(2)}}%`)
   } catch (err: any) {
-    ElMessage.error('加载1失败: ' + (err?.message || err));
+    ElMessage.error('加载失败: ' + (err?.message || err));
   }
 };
 

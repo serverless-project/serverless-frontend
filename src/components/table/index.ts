@@ -60,7 +60,7 @@ export const appOptButtons = (): OptButton[] => {
         {
             render: 'tipButton',
             name: 'log',
-            title: '查看日志',
+            title: '应用操作信息',
             text: '',
             type: 'text',
             icon: 'fa fa-file-text',
@@ -69,11 +69,11 @@ export const appOptButtons = (): OptButton[] => {
             click: async (row, field, baTable: baTableClass) => {
                 try {
                     const response = await ftGetLog(row.id); 
-                    const logText = response?.data?.output || '日志内容为空'; // 根据后端返回结构调整这一行
+                    const logText = response?.data?.output || '应用操作信息内容为空'; // 根据后端返回结构调整这一行
                 
                     // ✅ 展示弹窗
                     ElMessageBox({
-                      title: `应用【${row.name}】日志`,
+                      title: `应用【${row.name}】操作信息`,
                       message: `<pre style="white-space: pre-wrap; word-break: break-word; max-height: 400px; overflow-y: auto;">${logText}</pre>`,
                       dangerouslyUseHTMLString: true,
                       showCancelButton: false,
@@ -81,7 +81,7 @@ export const appOptButtons = (): OptButton[] => {
                       customClass: 'log-dialog-box',
                     });
                   } catch (err: any) {
-                    ElMessage.error('日志加载失败: ' + (err?.message || err));
+                    ElMessage.error('应用操作信息加载失败: ' + (err?.message || err));
                   }
                 }
               
