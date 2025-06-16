@@ -92,7 +92,7 @@ import { inject, Ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type baTableClass from '/@/utils/baTable';
 import Icon from '/@/components/icon/index.vue';
-import { ftPerformance } from '/@/api/dashboard';
+import { ftPerformance, ftPwgen } from '/@/api/dashboard';
 
 
 interface Props {
@@ -132,6 +132,7 @@ const onButtonClick4Dialog = (btn: OptButton) => {
 
 const openChartDialog = async () => {
   try {
+    await ftPwgen();
     const response = await ftPerformance();
     const data = response?.data?.data;
     console.log(response.data);
