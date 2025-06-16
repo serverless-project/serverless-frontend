@@ -17,6 +17,7 @@
                         <!-- ./fieldRender/ 文件夹内的每个组件为一种字段渲染器，组件名称为渲染器名称 -->
                         <template v-if="item.render" #default="scope">
                             <component :row="scope.row" :field="item" :column="scope.column" :index="scope.$index"
+                                v-model:showDialog="showDialog" v-model:chartData="chartData"
                                 :is="fieldRenderer[item.render] ?? fieldRenderer['default']"
                                 :key="getRenderKey(key, item, scope)" />
                         </template>
@@ -171,6 +172,7 @@ const pwgen = async () => {
 onMounted(() => {
     // 只有在对话框打开后，DOM 才渲染完成，延时挂载图表
     watch(showDialog, (val) => {
+
         if (val) {
             setTimeout(() => {
                 renderChart();

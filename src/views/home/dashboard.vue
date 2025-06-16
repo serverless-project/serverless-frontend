@@ -296,7 +296,7 @@ const baTable = new baTableClass(new baTableApi('/application/'), {
     {
       label: '操作',
       align: 'left',
-      width: 250,
+      width: 290,
       render: 'buttons',
       buttons: appOptButtons(),
       operator: false,

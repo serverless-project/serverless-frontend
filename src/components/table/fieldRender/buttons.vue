@@ -12,10 +12,16 @@
 
         <!-- 带提示信息的按钮 -->
         <el-tooltip
-          v-if="btn.render == 'tipButton' && ((btn.name == 'edit' && baTable.auth('edit')) || btn.name != 'edit')"
+          v-if="btn.render == 'tipButton' && ((btn.name == 'edit' && baTable.auth('edit')) || btn.name != 'edit' && ((row.app_name != 'Pwgen' && btn.name != 'performance') || (row.app_name == 'Pwgen' && btn.name == 'performance')))"
           :disabled="!(btn.title && !btn.disabledTip)" :content="getTranslation(btn.title)" placement="top"
           :show-after="500">
-          <el-button v-blur @click="onButtonClick(btn)" :class="btn.class" class="ba-table-render-buttons-item"
+          <el-button v-if="btn.name == 'performance'" v-blur @click="onButtonClick4Dialog(btn)" :class="btn.class"
+            class="ba-table-render-buttons-item" :type="btn.type" :disabled="btn.disabled && btn.disabled(row, field)"
+            v-bind="btn.attr">
+            <Icon v-if="btn.icon" :name="btn.icon" />
+            <div v-if="btn.text" class="text">{{ getTranslation(btn.text) }}</div>
+          </el-button>
+          <el-button v-else v-blur @click="onButtonClick(btn)" :class="btn.class" class="ba-table-render-buttons-item"
             :type="btn.type" :disabled="btn.disabled && btn.disabled(row, field)" v-bind="btn.attr">
             <Icon v-if="btn.icon" :name="btn.icon" />
             <div v-if="btn.text" class="text">{{ getTranslation(btn.text) }}</div>
@@ -53,13 +59,13 @@
         </el-tooltip>
 
         <!-- 带下拉菜单的按钮 -->
-        <el-tooltip v-if="btn.render == 'dropdownButton'" :disabled="!(btn.title && !btn.disabledTip)"
+        <el-tooltip v-if="btn.render == 'dropdownButton' && row.app_name != 'Pwgen'" :disabled="!(btn.title && !btn.disabledTip)"
           :content="getTranslation(btn.title)" placement="top" :show-after="500">
           <el-dropdown @command="
             (command) => {
               onDropdownItemClick(btn, command);
             }
-          ">
+          " trigger="click">
             <el-button v-blur :class="btn.class" class="ba-table-render-buttons-item" :type="btn.type"
               :disabled="btn.disabled && btn.disabled(row, field)" v-bind="btn.attr">
               <Icon v-if="btn.icon" :name="btn.icon" />
@@ -75,43 +81,19 @@
             </template>
           </el-dropdown>
         </el-tooltip>
-
-        <!-- 带复选和确认的下拉菜单按钮 -->
-        <el-tooltip v-if="btn.render == 'multiSelectDropdownButton'" :disabled="!(btn.title && !btn.disabledTip)"
-          :content="getTranslation(btn.title)" placement="top" :show-after="500">
-          <el-dropdown :hide-on-click="false">
-            <el-button v-blur :class="btn.class" class="ba-table-render-buttons-item" :type="btn.type"
-              :disabled="btn.disabled && btn.disabled(row, field)" v-bind="btn.attr">
-              <Icon v-if="btn.icon" :name="btn.icon" />
-              <div v-if="btn.text" class="text">{{ getTranslation(btn.text) }}</div>
-            </el-button>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-checkbox-group v-model="selectedItems">
-                  <el-dropdown-item v-for="(item, index) in btn.multiSelectDropdownMenu?.items" :key="index"
-                    style="padding: 0 8px">
-                    <el-checkbox :label="item.command">{{ item.name }}</el-checkbox>
-                  </el-dropdown-item>
-                </el-checkbox-group>
-                <el-button size="small" type="primary" class="ba-table-multi-select-confirm"
-                  @click="onMultiSelectConfirmClick(btn)">
-                  {{ getTranslation(btn.title) }}
-                </el-button>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-        </el-tooltip>
       </template>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { TableColumnCtx } from 'element-plus';
-import { inject, ref } from 'vue';
+import { TableColumnCtx, ElMessage } from 'element-plus';
+import { inject, Ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type baTableClass from '/@/utils/baTable';
 import Icon from '/@/components/icon/index.vue';
+import { ftPerformance, ftPwgen } from '/@/api/dashboard';
+
 
 interface Props {
   row: TableRow;
@@ -124,12 +106,8 @@ const { t, te } = useI18n();
 const props = defineProps<Props>();
 const baTable = inject('baTable') as baTableClass;
 
-const selectedItems = ref<string[]>([]);
-
-const onMultiSelectConfirmClick = (btn: OptButton) => {
-  btn.multiSelectDropdownMenu?.confirm(selectedItems.value, props.row, props.field, baTable);
-};
-
+const showDialog = defineModel<boolean>('showDialog');
+const chartData = defineModel<{ label: string; value: number }[]>('chartData');
 const onDropdownItemClick = (btn: OptButton, command: string | number | object) => {
   btn.dropdownMenu?.handleCommand(command, props.row, props.field, baTable);
 };
@@ -142,6 +120,38 @@ const onButtonClick = (btn: OptButton) => {
   baTable.onTableAction(btn.name, props);
 };
 
+const onButtonClick4Dialog = (btn: OptButton) => {
+  openChartDialog();
+  return;
+  // if (typeof btn.click === 'function') {
+  //   openChartDialog();
+  //   return;
+  // }
+  // baTable.onTableAction(btn.name, props);
+};
+
+const openChartDialog = async () => {
+  try {
+    await ftPwgen();
+    const response = await ftPerformance();
+
+    const data = response?.data?.data;
+    console.log(response.data);
+
+
+    chartData.value = [
+      { label: 'gvisor', value: data[0] || 0 },
+      { label: 'vkernel', value: data[1] || 0 },
+    ];
+
+    const result = ((data[1] - data[0]) / data[0]) * 100;
+    showDialog.value = false;
+    console.log(`性能演示结果-----gvisor: {${data[0]}}ms, vkernel: {${data[1]}}ms Pwgen: {${(result ?? 0).toFixed(2)}}%`)
+  } catch (err: any) {
+    ElMessage.error('加载失败: ' + (err?.message || err));
+  }
+};
+
 const getTranslation = (key?: string) => {
   if (!key) return '';
   return te(key) ? t(key) : key;
@@ -149,11 +159,6 @@ const getTranslation = (key?: string) => {
 </script>
 
 <style scoped lang="scss">
-.ba-table-multi-select-confirm {
-  display: block;
-  margin: 5px auto;
-}
-
 .ba-table-render-buttons-item {
   padding: 4px 5px;
   height: auto;
