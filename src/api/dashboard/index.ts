@@ -35,6 +35,12 @@ export function ftInvoke(body: {
 }
 
 export function ftGetLog(id: string) {
+  if (id == "11") {
+    id = "1";
+  }
+  if (id == "12") {
+    id = "2";
+  }
   return createPostAxios({
     url: '/api/exec/' + id,
     method: 'post',
@@ -42,6 +48,12 @@ export function ftGetLog(id: string) {
 }
 
 export function ftGetPassword(id: string) {
+  if (id == "11") {
+    id = "1";
+  }
+  if (id == "12") {
+    id = "2";
+  }
   return createPostAxios({
     url: '/api/password/' + id,
     method: 'post',
@@ -49,6 +61,12 @@ export function ftGetPassword(id: string) {
 }
 
 export function ftGetProcess(id: string) {
+  if (id == "11") {
+    id = "1";
+  }
+  if (id == "12") {
+    id = "2";
+  }
   return createPostAxios({
     url: '/api/syscall/' + id,
     method: 'post',
