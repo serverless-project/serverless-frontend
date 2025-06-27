@@ -13,9 +13,18 @@ watch(
   () => baTable.form.items?.status,
   (newStatus) => {
     if (newStatus) {
-      highlightedLog.value = hljs.highlight(newStatus, { language: 'plaintext' }).value;
+      const filteredLines = newStatus.split('\n').filter((line: string) => {
+        return (
+          !line.startsWith('Error from server') &&
+          !line.includes('ERROR Engine') &&
+          !line.includes('(core dumped)') &&
+          !line.includes('DeprecationWarning') && 
+          !line.includes('node --trace-deprecation')
+        );
+      }).join('\n');
+      highlightedLog.value = hljs.highlight(filteredLines, { language: 'plaintext' }).value;
     } else {
-      highlightedLog.value = ''
+      highlightedLog.value = '';
     }
   }
 );

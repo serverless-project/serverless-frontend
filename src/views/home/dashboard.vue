@@ -261,6 +261,7 @@ const baTable = new baTableClass(new baTableApi('/application/'), {
       align: 'left',
       operator: 'LIKE',
       operatorPlaceholder: t('Fuzzy query'),
+      width: 190,
     },
     {
       label: t('State'),
@@ -296,7 +297,7 @@ const baTable = new baTableClass(new baTableApi('/application/'), {
     {
       label: '操作',
       align: 'left',
-      width: 290,
+      width: 320,
       render: 'buttons',
       buttons: appOptButtons(),
       operator: false,
@@ -316,6 +317,21 @@ const baTable = new baTableClass(new baTableApi('/application/'), {
 
 baTable.mount();
 baTable.getIndex();
+
+// 在 baTable.getIndex() 后添加
+watch(
+  () => baTable.table.data,
+  (newData) => {
+    if (newData) {
+      newData.forEach((row) => {
+        if (row.app_default_provider && !row.app_provider) {
+          row.app_provider = row.app_default_provider;
+        }
+      });
+    }
+  },
+  { immediate: true, deep: true }
+);
 
 provide('baTable', baTable);
 
@@ -416,9 +432,14 @@ watch(
         <TableHeader style="outline: none" :buttons="['refresh', 'add', 'delete', 'columnDisplay']" />
         <Table ref="tableRef">
           <template #provider>
-            <el-table-column label="模式" width="140">
+            <el-table-column label="模式" width="185">
               <template #default="scope">
                 <el-select size="small" v-model="scope.row.app_provider" placeholder="选择模式">
+                  <el-option label="network_optimization" value="network_optimization" />
+                  <el-option label="fault_tolerance" value="fault_tolerance" />
+                  <el-option label="permission_isolation" value="permission_isolation" />
+                  <el-option label="opinfo_isolation" value="opinfo_isolation" />
+                  <el-option label="syscall_isolation" value="syscall_isolation" />
                   <el-option v-for="item in scope.row.app_providers" :key="item" :label="item" :value="item" />
                 </el-select>
               </template>

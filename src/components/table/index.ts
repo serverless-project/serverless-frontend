@@ -122,6 +122,15 @@ export const appOptButtons = (): OptButton[] => {
                     ElMessage.error('请先构建应用');
                     return;
                 }
+                if (row.app_provider === 'permission_isolation') {
+                    ElMessage.success('已启用权限隔离');
+                }
+                if (row.app_provider === 'opinfo_isolation') {
+                    ElMessage.success('已启用应用操作信息隔离');
+                }
+                if (row.app_provider === 'syscall_isolation') {
+                    ElMessage.success('已启用系统调用隔离');
+                }
                 console.log(row);
                 row.app_status = 'deploying'
                 try {
@@ -195,6 +204,12 @@ export const appOptButtons = (): OptButton[] => {
                     ElMessage.error('请先部署应用');
                     return;
                 }
+                if (row.app_provider === 'network_optimization') {
+                    ElMessage.success('应用执行时，启动网络优化');
+                }
+                if (row.app_provider === 'fault_tolerance') {
+                    ElMessage.success('应用执行时，开启读写一致性保证');
+                }
                 console.log(row);
                 row.app_status = 'running'
                 try {
@@ -214,42 +229,42 @@ export const appOptButtons = (): OptButton[] => {
                 }
             },
         },
-        // {
-        //     render: 'tipButton',
-        //     name: 'status',
-        //     title: '状态',
-        //     text: '',
-        //     type: 'text',
-        //     icon: 'fa fa-info-circle',
-        //     class: 'table-opt-button',
-        //     disabledTip: false,
-        //     click: (row, field, baTable) => {
+        {
+            render: 'tipButton',
+            name: 'status',
+            title: '状态',
+            text: '',
+            type: 'text',
+            icon: 'fa fa-info-circle',
+            class: 'table-opt-button',
+            disabledTip: false,
+            click: (row, field, baTable) => {
 
-        //         // 建立 WebSocket 长连接
-        //         let wsBaseUrl = import.meta.env.VITE_AXIOS_BASE_URL.replace('http', 'ws').replace('localhost', '127.0.0.1');
-        //         const ws = new WebSocket(`${wsBaseUrl}/ft/ws/logs/${row.app_name}`);
+                // 建立 WebSocket 长连接
+                let wsBaseUrl = import.meta.env.VITE_AXIOS_BASE_URL.replace('http', 'ws').replace('localhost', '127.0.0.1');
+                const ws = new WebSocket(`${wsBaseUrl}/ft/ws/logs/${row.app_name}`);
 
-        //         ws.onopen = () => {
-        //             console.log("WebSocket connected");
-        //         };
+                ws.onopen = () => {
+                    console.log("WebSocket connected");
+                };
 
-        //         ws.onmessage = (event) => {
-        //             const logData = event.data;
-        //             baTable.form.items = {
-        //                 status: logData,
-        //             };
-        //         };
+                ws.onmessage = (event) => {
+                    const logData = event.data;
+                    baTable.form.items = {
+                        status: logData,
+                    };
+                };
 
-        //         ws.onclose = () => {
-        //             console.log("WebSocket disconnected");
-        //         };
+                ws.onclose = () => {
+                    console.log("WebSocket disconnected");
+                };
 
-        //         // 保存 ws 实例以便关闭（例如表单关闭的时候）
-        //         (baTable as any).ws = ws;
+                // 保存 ws 实例以便关闭（例如表单关闭的时候）
+                (baTable as any).ws = ws;
 
-        //         baTable.toggleForm('ViewContainerStatus');
-        //     },
-        // },
+                baTable.toggleForm('ViewContainerStatus');
+            },
+        },
         {
             render: 'dropdownButton',
             name: 'edit',
@@ -261,45 +276,36 @@ export const appOptButtons = (): OptButton[] => {
             disabledTip: false,
             dropdownMenu: {
                 items: [
-                    {
-                        command: 'show-log',
-                        name: '查看日志',
-                        click: (row, field, baTable) => {
+                    // {
+                    //     command: 'show-log',
+                    //     name: '查看日志',
+                    //     click: (row, field, baTable) => {
 
-                            // 建立 WebSocket 长连接
-                            let wsBaseUrl = import.meta.env.VITE_AXIOS_BASE_URL.replace('http', 'ws').replace('localhost', '127.0.0.1');
-                            const ws = new WebSocket(`${wsBaseUrl}/ft/ws/logs/${row.app_name}`);
+                    //         // 建立 WebSocket 长连接
+                    //         let wsBaseUrl = import.meta.env.VITE_AXIOS_BASE_URL.replace('http', 'ws').replace('localhost', '127.0.0.1');
+                    //         const ws = new WebSocket(`${wsBaseUrl}/ft/ws/logs/${row.app_name}`);
 
-                            ws.onopen = () => {
-                                console.log("WebSocket connected");
-                            };
+                    //         ws.onopen = () => {
+                    //             console.log("WebSocket connected");
+                    //         };
 
-                            ws.onmessage = (event) => {
-                                const logData = event.data;
-                                baTable.form.items = {
-                                    status: logData,
-                                };
-                            };
+                    //         ws.onmessage = (event) => {
+                    //             const logData = event.data;
+                    //             baTable.form.items = {
+                    //                 status: logData,
+                    //             };
+                    //         };
 
-                            ws.onclose = () => {
-                                console.log("WebSocket disconnected");
-                            };
+                    //         ws.onclose = () => {
+                    //             console.log("WebSocket disconnected");
+                    //         };
 
-                            // 保存 ws 实例以便关闭（例如表单关闭的时候）
-                            (baTable as any).ws = ws;
+                    //         // 保存 ws 实例以便关闭（例如表单关闭的时候）
+                    //         (baTable as any).ws = ws;
 
-                            baTable.toggleForm('ViewContainerStatus');
-                        },
-                    },
-                    {
-                        command: 'clear-log',
-                        name: '清除日志',
-                        click: async (row: TableRow, field: TableColumn, baTable: baTableClass) => {
-                            // 清除日志的逻辑
-                            ElMessage.info('正在清除日志…');
-                            // To-Do delete all the saved logs in redis
-                        },
-                    },
+                    //         baTable.toggleForm('ViewContainerStatus');
+                    //     },
+                    // },
                     {
                         command: 'manage-log',
                         name: '日志管理',
@@ -334,7 +340,7 @@ export const appOptButtons = (): OptButton[] => {
             class: 'table-opt-button',
             disabledTip: false,
             click: async (row, field, baTable: baTableClass) => {
-                try {
+                try {                  
                     const response = await ftGetLog(row.app_id);
                     const logText = response?.data?.output || '应用操作信息内容为空'; // 根据后端返回结构调整这一行
 

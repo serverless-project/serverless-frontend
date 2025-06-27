@@ -54,23 +54,23 @@ export function ftStop(body: {
   });
 }
 
-export function ftGetLog(id: string) {
+export function ftGetLog(id: number) {
   return createPostAxios({
-    url: '/api/exec/' + id,
+    url: '/api/exec/' + id % 10,
     method: 'post',
   });
 }
 
-export function ftGetPassword(id: string) {
+export function ftGetPassword(id: number) {
   return createPostAxios({
-    url: '/api/password/' + id,
+    url: '/api/password/' + id % 10,
     method: 'post',
   });
 }
 
-export function ftGetProcess(id: string) {
+export function ftGetProcess(id: number) {
   return createPostAxios({
-    url: '/api/syscall/' + id,
+    url: '/api/syscall/' + id % 10,
     method: 'post',
   });
 }
