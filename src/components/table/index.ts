@@ -122,15 +122,15 @@ export const appOptButtons = (): OptButton[] => {
                     ElMessage.error('请先构建应用');
                     return;
                 }
-                if (row.app_provider === 'permission_isolation') {
-                    ElMessage.success('已启用权限隔离');
-                }
-                if (row.app_provider === 'opinfo_isolation') {
-                    ElMessage.success('已启用应用操作信息隔离');
-                }
-                if (row.app_provider === 'syscall_isolation') {
-                    ElMessage.success('已启用系统调用隔离');
-                }
+                // if (row.app_provider === 'permission_isolation') {
+                //     ElMessage.success('已启用权限隔离');
+                // }
+                // if (row.app_provider === 'opinfo_isolation') {
+                //     ElMessage.success('已启用应用操作信息隔离');
+                // }
+                // if (row.app_provider === 'syscall_isolation') {
+                //     ElMessage.success('已启用系统调用隔离');
+                // }
                 console.log(row);
                 row.app_status = 'deploying'
                 try {
@@ -152,7 +152,7 @@ export const appOptButtons = (): OptButton[] => {
         {
             render: 'tipButton',
             name: 'stop',
-            title: '终止（卸载）',
+            title: '终止',
             text: '',
             type: 'text',
             icon: 'fa fa-stop',
@@ -204,12 +204,12 @@ export const appOptButtons = (): OptButton[] => {
                     ElMessage.error('请先部署应用');
                     return;
                 }
-                if (row.app_provider === 'network_optimization') {
-                    ElMessage.success('应用执行时，启动网络优化');
-                }
-                if (row.app_provider === 'fault_tolerance') {
-                    ElMessage.success('应用执行时，开启读写一致性保证');
-                }
+                // if (row.app_provider === 'network_optimization') {
+                //     ElMessage.success('应用执行时，启动网络优化');
+                // }
+                // if (row.app_provider === 'fault_tolerance') {
+                //     ElMessage.success('应用执行时，开启读写一致性保证');
+                // }
                 console.log(row);
                 row.app_status = 'running'
                 try {
@@ -265,157 +265,157 @@ export const appOptButtons = (): OptButton[] => {
                 baTable.toggleForm('ViewContainerStatus');
             },
         },
-        {
-            render: 'dropdownButton',
-            name: 'edit',
-            title: '日志管理',
-            text: '',
-            type: 'text',
-            icon: 'fa fa-file',
-            class: 'table-opt-button',
-            disabledTip: false,
-            dropdownMenu: {
-                items: [
-                    // {
-                    //     command: 'show-log',
-                    //     name: '查看日志',
-                    //     click: (row, field, baTable) => {
+        // {
+        //     render: 'dropdownButton',
+        //     name: 'edit',
+        //     title: '日志管理',
+        //     text: '',
+        //     type: 'text',
+        //     icon: 'fa fa-file',
+        //     class: 'table-opt-button',
+        //     disabledTip: false,
+        //     dropdownMenu: {
+        //         items: [
+        //             {
+        //                 command: 'show-log',
+        //                 name: '查看日志',
+        //                 click: (row, field, baTable) => {
 
-                    //         // 建立 WebSocket 长连接
-                    //         let wsBaseUrl = import.meta.env.VITE_AXIOS_BASE_URL.replace('http', 'ws').replace('localhost', '127.0.0.1');
-                    //         const ws = new WebSocket(`${wsBaseUrl}/ft/ws/logs/${row.app_name}`);
+        //                     // 建立 WebSocket 长连接
+        //                     let wsBaseUrl = import.meta.env.VITE_AXIOS_BASE_URL.replace('http', 'ws').replace('localhost', '127.0.0.1');
+        //                     const ws = new WebSocket(`${wsBaseUrl}/ft/ws/logs/${row.app_name}`);
 
-                    //         ws.onopen = () => {
-                    //             console.log("WebSocket connected");
-                    //         };
+        //                     ws.onopen = () => {
+        //                         console.log("WebSocket connected");
+        //                     };
 
-                    //         ws.onmessage = (event) => {
-                    //             const logData = event.data;
-                    //             baTable.form.items = {
-                    //                 status: logData,
-                    //             };
-                    //         };
+        //                     ws.onmessage = (event) => {
+        //                         const logData = event.data;
+        //                         baTable.form.items = {
+        //                             status: logData,
+        //                         };
+        //                     };
 
-                    //         ws.onclose = () => {
-                    //             console.log("WebSocket disconnected");
-                    //         };
+        //                     ws.onclose = () => {
+        //                         console.log("WebSocket disconnected");
+        //                     };
 
-                    //         // 保存 ws 实例以便关闭（例如表单关闭的时候）
-                    //         (baTable as any).ws = ws;
+        //                     // 保存 ws 实例以便关闭（例如表单关闭的时候）
+        //                     (baTable as any).ws = ws;
 
-                    //         baTable.toggleForm('ViewContainerStatus');
-                    //     },
-                    // },
-                    {
-                        command: 'manage-log',
-                        name: '日志管理',
-                        click: (row: TableRow, field: TableColumn, baTable: baTableClass) => {
-                            // 跳转到日志管理页面，比如 /logs?app=<app_name>
-                            window.open(`http://39.104.200.127:8889`, '_blank');
-                        },
-                    },
-                ],
-                handleCommand(
-                    command: string,
-                    row: TableRow,
-                    field: TableColumn,
-                    baTable: baTableClass
-                ) {
-                    const item = this.items.find((i) => i.command === command);
-                    if (item && typeof item.click === 'function') {
-                        item.click(row, field, baTable);
-                    } else {
-                        console.warn(`[dropdownButton] 未找到 command = "${command}" 对应的菜单项`);
-                    }
-                },
-            },
-        },
-        {
-            render: 'tipButton',
-            name: 'log',
-            title: '应用操作信息',
-            text: '',
-            type: 'text',
-            icon: 'fa fa-file-text',
-            class: 'table-opt-button',
-            disabledTip: false,
-            click: async (row, field, baTable: baTableClass) => {
-                try {                  
-                    const response = await ftGetLog(row.app_id);
-                    const logText = response?.data?.output || '应用操作信息内容为空'; // 根据后端返回结构调整这一行
+        //                     baTable.toggleForm('ViewContainerStatus');
+        //                 },
+        //             },
+        //             {
+        //                 command: 'manage-log',
+        //                 name: '日志管理',
+        //                 click: (row: TableRow, field: TableColumn, baTable: baTableClass) => {
+        //                     // 跳转到日志管理页面，比如 /logs?app=<app_name>
+        //                     window.open(`http://39.104.200.127:8889`, '_blank');
+        //                 },
+        //             },
+        //         ],
+        //         handleCommand(
+        //             command: string,
+        //             row: TableRow,
+        //             field: TableColumn,
+        //             baTable: baTableClass
+        //         ) {
+        //             const item = this.items.find((i) => i.command === command);
+        //             if (item && typeof item.click === 'function') {
+        //                 item.click(row, field, baTable);
+        //             } else {
+        //                 console.warn(`[dropdownButton] 未找到 command = "${command}" 对应的菜单项`);
+        //             }
+        //         },
+        //     },
+        // },
+        // {
+        //     render: 'tipButton',
+        //     name: 'log',
+        //     title: '应用操作信息',
+        //     text: '',
+        //     type: 'text',
+        //     icon: 'fa fa-file-text',
+        //     class: 'table-opt-button',
+        //     disabledTip: false,
+        //     click: async (row, field, baTable: baTableClass) => {
+        //         try {                  
+        //             const response = await ftGetLog(row.app_id);
+        //             const logText = response?.data?.output || '应用操作信息内容为空'; // 根据后端返回结构调整这一行
 
-                    // ✅ 展示弹窗
-                    ElMessageBox({
-                        title: `应用【${row.app_name}】操作信息`,
-                        message: `<pre style="white-space: pre-wrap; word-break: break-word; max-height: 400px; overflow-y: auto;">${logText}</pre>`,
-                        dangerouslyUseHTMLString: true,
-                        showCancelButton: false,
-                        confirmButtonText: '关闭',
-                        customClass: 'log-dialog-box',
-                    });
-                } catch (err: any) {
-                    ElMessage.error('应用操作信息加载失败: ' + (err?.message || err));
-                }
-            }
-        },
-        {
-            render: 'tipButton',
-            name: 'access priority',
-            title: '访问权限',
-            text: '',
-            type: 'text',
-            icon: 'fa fa-lock',
-            class: 'table-opt-button',
-            disabledTip: false,
-            click: async (row, field, baTable: baTableClass) => {
-                try {
-                    const response = await ftGetPassword(row.app_id);
-                    const logText = response?.data?.output || '访问权限内容为空'; // 根据后端返回结构调整这一行
+        //             // ✅ 展示弹窗
+        //             ElMessageBox({
+        //                 title: `应用【${row.app_name}】操作信息`,
+        //                 message: `<pre style="white-space: pre-wrap; word-break: break-word; max-height: 400px; overflow-y: auto;">${logText}</pre>`,
+        //                 dangerouslyUseHTMLString: true,
+        //                 showCancelButton: false,
+        //                 confirmButtonText: '关闭',
+        //                 customClass: 'log-dialog-box',
+        //             });
+        //         } catch (err: any) {
+        //             ElMessage.error('应用操作信息加载失败: ' + (err?.message || err));
+        //         }
+        //     }
+        // },
+        // {
+        //     render: 'tipButton',
+        //     name: 'access priority',
+        //     title: '访问权限',
+        //     text: '',
+        //     type: 'text',
+        //     icon: 'fa fa-lock',
+        //     class: 'table-opt-button',
+        //     disabledTip: false,
+        //     click: async (row, field, baTable: baTableClass) => {
+        //         try {
+        //             const response = await ftGetPassword(row.app_id);
+        //             const logText = response?.data?.output || '访问权限内容为空'; // 根据后端返回结构调整这一行
 
-                    console.log(response);
-                    // ✅ 展示弹窗
-                    ElMessageBox({
-                        title: `应用:【${row.app_name}】密码`,
-                        message: `<pre style="white-space: pre-wrap; word-break: break-word; max-height: 600px; overflow-y: auto;">${logText}</pre>`,
-                        dangerouslyUseHTMLString: true,
-                        showCancelButton: false,
-                        confirmButtonText: '关闭',
-                        customClass: 'log-dialog-box',
-                    });
-                } catch (err: any) {
-                    ElMessage.error('密码加载失败: ' + (err?.message || err));
-                }
-            }
-        },
-        {
-            render: 'tipButton',
-            name: 'syscall',
-            title: '系统调用',
-            text: '',
-            type: 'text',
-            icon: 'fa fa-wrench',
-            class: 'table-opt-button',
-            disabledTip: false,
-            click: async (row, field, baTable: baTableClass) => {
-                try {
-                    const response = await ftGetProcess(row.app_id);
-                    const logText = response?.data?.output || '进程号内容为空'; // 根据后端返回结构调整这一行
+        //             console.log(response);
+        //             // ✅ 展示弹窗
+        //             ElMessageBox({
+        //                 title: `应用:【${row.app_name}】密码`,
+        //                 message: `<pre style="white-space: pre-wrap; word-break: break-word; max-height: 600px; overflow-y: auto;">${logText}</pre>`,
+        //                 dangerouslyUseHTMLString: true,
+        //                 showCancelButton: false,
+        //                 confirmButtonText: '关闭',
+        //                 customClass: 'log-dialog-box',
+        //             });
+        //         } catch (err: any) {
+        //             ElMessage.error('密码加载失败: ' + (err?.message || err));
+        //         }
+        //     }
+        // },
+        // {
+        //     render: 'tipButton',
+        //     name: 'syscall',
+        //     title: '系统调用',
+        //     text: '',
+        //     type: 'text',
+        //     icon: 'fa fa-wrench',
+        //     class: 'table-opt-button',
+        //     disabledTip: false,
+        //     click: async (row, field, baTable: baTableClass) => {
+        //         try {
+        //             const response = await ftGetProcess(row.app_id);
+        //             const logText = response?.data?.output || '进程号内容为空'; // 根据后端返回结构调整这一行
 
-                    console.log(response);
-                    // ✅ 展示弹窗
-                    ElMessageBox({
-                        title: `应用:【${row.app_name}】进程号`,
-                        message: `<pre style="white-space: pre-wrap; word-break: break-word; max-height: 600px; overflow-y: auto;">${logText}</pre>`,
-                        dangerouslyUseHTMLString: true,
-                        showCancelButton: false,
-                        confirmButtonText: '关闭',
-                        customClass: 'log-dialog-box',
-                    });
-                } catch (err: any) {
-                    ElMessage.error('进程号加载失败: ' + (err?.message || err));
-                }
-            }
-        },
+        //             console.log(response);
+        //             // ✅ 展示弹窗
+        //             ElMessageBox({
+        //                 title: `应用:【${row.app_name}】进程号`,
+        //                 message: `<pre style="white-space: pre-wrap; word-break: break-word; max-height: 600px; overflow-y: auto;">${logText}</pre>`,
+        //                 dangerouslyUseHTMLString: true,
+        //                 showCancelButton: false,
+        //                 confirmButtonText: '关闭',
+        //                 customClass: 'log-dialog-box',
+        //             });
+        //         } catch (err: any) {
+        //             ElMessage.error('进程号加载失败: ' + (err?.message || err));
+        //         }
+        //     }
+        // },
         {
             render: 'tipButton',
             name: 'performance',

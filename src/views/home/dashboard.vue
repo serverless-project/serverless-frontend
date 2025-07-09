@@ -288,16 +288,16 @@ const baTable = new baTableClass(new baTableApi('/application/'), {
       },
       width: 80,
     },
-    {
-      label: '模式',
-      render: 'slot',
-      slotName: 'provider',
-      operator: 'LIKE'
-    },
+    // {
+    //   label: '模式',
+    //   render: 'slot',
+    //   slotName: 'provider',
+    //   operator: 'LIKE'
+    // },
     {
       label: '操作',
       align: 'left',
-      width: 320,
+      width: 210,
       render: 'buttons',
       buttons: appOptButtons(),
       operator: false,
