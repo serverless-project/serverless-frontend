@@ -21,6 +21,14 @@ watch(
           !line.includes('DeprecationWarning') && 
           !line.includes('node --trace-deprecation')
         );
+      }).map((line: string) => {
+        // 匹配并提取 INFO Latency 或 INFO Overall latency 行的 avg 值
+        const latencyMatch = line.match(/^(.*INFO (Latency|Overall latency) \(s\):).*avg=([0-9.]+)/);
+        if (latencyMatch) {
+          // 保留前面的部分，并只替换 avg= 后面的部分
+          return `${latencyMatch[1]} avg=${latencyMatch[3]}`;
+        }
+        return line;
       }).join('\n');
       highlightedLog.value = hljs.highlight(filteredLines, { language: 'plaintext' }).value;
     } else {
