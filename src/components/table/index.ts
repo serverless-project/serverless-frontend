@@ -4,6 +4,7 @@ import type baTableClass from '/@/utils/baTable';
 import { ftBuild, ftDeploy, ftGetLog, ftGetPassword, ftGetProcess, ftInvoke, ftStop } from '/@/api/dashboard';
 import router from '/@/router';
 import { cloneDeep } from 'lodash-es';
+import { getUrl } from '/@/utils/axios';
 
 const isDeployed = (status: string) => {
     return status === 'deployed' || status === 'running' || status === 'runned'
@@ -242,7 +243,7 @@ export const appOptButtons = (): OptButton[] => {
             click: (row, field, baTable) => {
 
                 // 建立 WebSocket 长连接
-                let wsBaseUrl = import.meta.env.VITE_AXIOS_BASE_URL.replace('http', 'ws').replace('localhost', '127.0.0.1');
+                let wsBaseUrl = getUrl().replace('http', 'ws').replace('localhost', '127.0.0.1');
                 const ws = new WebSocket(`${wsBaseUrl}/ft/ws/logs/${row.app_name}`);
 
                 ws.onopen = () => {
