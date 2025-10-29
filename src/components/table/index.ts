@@ -67,7 +67,8 @@ export const appOptButtons = (): OptButton[] => {
             click: async (row, field, baTable: baTableClass) => {
                 // TODO: 打开编辑器
                 // window.open('http://192.168.28.220/code', '_blank');
-                window.open(`http://39.104.200.127:8088/?folder=${row.app_path}`, '_blank');
+                const editorUrl = `${window.location.protocol}//${window.location.hostname}:8088/?folder=${row.app_path }`;
+                window.open(editorUrl, '_blank');
             },
         },
         {

@@ -8,7 +8,16 @@ import { useUserInfo } from '/@/stores/userInfo';
  */
 export const getUrl = (): string => {
     const value: string = import.meta.env.VITE_AXIOS_BASE_URL as string
-    return (value == 'getCurrentDomain' ? window.location.protocol + '//' + window.location.host : value)
+    // 如果未配置或为空，默认使用当前地址，端口号为8328
+    if (!value || value.trim() === '') {
+        return window.location.protocol + '//' + window.location.hostname + ':8328'
+    }
+    // 如果值为 'getCurrentDomain'，使用当前完整地址（包括端口）
+    if (value == 'getCurrentDomain') {
+        return window.location.protocol + '//' + window.location.host
+    }
+    // 否则返回配置的值
+    return value
 }
 
 interface Options {
