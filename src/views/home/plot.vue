@@ -11,6 +11,13 @@ const ys = ref<number[]>([5, 9, 13, 19, 22, 25, 28, 31, 33, 34, 35, 38, 40, 42, 
 const chartRef = ref<HTMLDivElement | null>(null)
 let chart: echarts.ECharts | null = null
 
+const chartRef2 = ref<HTMLDivElement | null>(null)
+let chart2: echarts.ECharts | null = null
+
+// GPU内存使用数据
+const timelineData = ref<number[]>([])
+const baselineData = ref<number[]>([])
+
 function initChart() {
   if (!chartRef.value) return
   chart = echarts.init(chartRef.value)
@@ -65,8 +72,143 @@ function initChart() {
   })
 }
 
+function initChart2() {
+  if (!chartRef2.value) return
+  chart2 = echarts.init(chartRef2.value)
+  
+  updateChart2()
+}
+
+function updateChart2() {
+  if (!chart2) return
+  
+  const data1 = timelineData.value
+  const data2 = baselineData.value
+  
+  // 如果没有数据，使用默认空数组
+  if (data1.length === 0 || data2.length === 0) {
+    return
+  }
+  
+  const avg1 = data1.reduce((a, b) => a + b, 0) / data1.length
+  const avg2 = data2.reduce((a, b) => a + b, 0) / data2.length
+  
+  // 时间轴：根据数据长度生成，假设每个数据点间隔10ms
+  const dataLength = Math.max(data1.length, data2.length)
+  const time1 = Array.from({ length: data1.length }, (_, i) => i * 10)
+  const time2 = Array.from({ length: data2.length }, (_, i) => i * 10)
+  const timeMax = Array.from({ length: dataLength }, (_, i) => i * 10)
+  
+  chart2.setOption({
+    title: {
+      text: 'GPU Memory Usage Over Time',
+      left: 'center',
+      top: 8,
+      textStyle: { fontSize: 16, fontWeight: 600 }
+    },
+    tooltip: {
+      trigger: 'axis',
+      formatter: (params: any) => {
+        const lines: string[] = []
+        params.forEach((p: any) => {
+          // 跳过平均线，只显示数据点
+          if (!p.seriesName.includes('Avg')) {
+            const yValue = Array.isArray(p.value) ? p.value[1] : p.value
+            lines.push(`${p.seriesName}: ${yValue.toFixed(2)} GB`)
+          }
+        })
+        if (lines.length === 0) return ''
+        return `Time-lines: ${params[0].axisValue || params[0].name} ms<br/>${lines.join('<br/>')}`
+      }
+    },
+    grid: { left: 90, right: 40, top: 50, bottom: 70 },
+    xAxis: {
+      type: 'value',
+      name: 'Time-lines (ms)',
+      nameLocation: 'middle',
+      nameGap: 30,
+      nameTextStyle: { fontSize: 14 },
+      min: 0,
+      axisLine: { lineStyle: { color: '#999' } },
+      axisTick: { show: true },
+      axisLabel: { 
+        color: '#666', 
+        margin: 12, 
+        fontSize: 13,
+        formatter: (value: number) => {
+          // 确保数值正确显示，不使用科学计数法
+          return value.toString()
+        }
+      },
+      splitLine: { 
+        show: true,
+        lineStyle: { type: 'dashed', color: '#ddd', opacity: 0.6 }
+      },
+    },
+    yAxis: {
+      type: 'value',
+      name: 'Memory Footprint (GB)',
+      nameLocation: 'middle',
+      nameGap: 50,
+      nameTextStyle: { fontSize: 14 },
+      scale: true,
+      axisLine: { show: false },
+      axisLabel: { 
+        color: '#666', 
+        fontSize: 13,
+        show: true,
+      },
+      splitLine: { 
+        show: true,
+        lineStyle: { type: 'dashed', color: '#ddd', opacity: 0.6 }
+      },
+    },
+    series: [
+      {
+        type: 'line',
+        name: 'Streambox Timeline',
+        data: data1.map((val, i) => [time1[i], val]),
+        symbol: 'circle',
+        symbolSize: 6,
+        lineStyle: { color: '#409eff', width: 2 },
+        itemStyle: { color: '#409eff' },
+      },
+      {
+        type: 'line',
+        name: 'Baseline Timeline',
+        data: data2.map((val, i) => [time2[i], val]),
+        symbol: 'rect',
+        symbolSize: 6,
+        lineStyle: { color: '#f56c6c', width: 2, type: 'dashed' },
+        itemStyle: { color: '#f56c6c' },
+      },
+      {
+        type: 'line',
+        name: `Streambox Avg (${avg1.toFixed(2)} GB)`,
+        data: timeMax.map(t => [t, avg1]),
+        lineStyle: { color: '#5a72c1', width: 1.8, type: 'dashed' },
+        symbol: 'none',
+        z: 10,
+      },
+      {
+        type: 'line',
+        name: `Baseline Avg (${avg2.toFixed(2)} GB)`,
+        data: timeMax.map(t => [t, avg2]),
+        lineStyle: { color: '#9fc97e', width: 3 },
+        symbol: 'none',
+        z: 10,
+      },
+    ],
+    legend: {
+      bottom: 10,
+      left: 'center',
+    },
+  })
+}
+
 function resizeChart() {
   if (chart) chart.resize()
+  if (chart2) chart2.resize()
 }
 
 async function loadData() {
@@ -87,9 +229,25 @@ async function loadData() {
   }
 }
 
+async function loadPerformanceIsolationData() {
+  try {
+    const resp = await createAxios({ url: '/plot/performance-isolation', method: 'get' })
+    const data = resp?.data?.data || {}
+    timelineData.value = Array.isArray(data.timeline) ? data.timeline : []
+    baselineData.value = Array.isArray(data.baseline) ? data.baseline : []
+    
+    // 更新图表
+    updateChart2()
+  } catch (e: any) {
+    ElMessage.error(e?.message || '性能隔离数据加载失败')
+  }
+}
+
 onMounted(() => {
   initChart()
   loadData()
+  initChart2()
+  loadPerformanceIsolationData()
   window.addEventListener('resize', resizeChart)
 })
 
@@ -98,6 +256,10 @@ onBeforeUnmount(() => {
   if (chart) {
     chart.dispose()
     chart = null
+  }
+  if (chart2) {
+    chart2.dispose()
+    chart2 = null
   }
 })
 </script>
@@ -111,6 +273,16 @@ onBeforeUnmount(() => {
 
       <div class="chart-wrapper">
         <div ref="chartRef" class="echart"></div>
+      </div>
+    </el-card>
+
+    <el-card shadow="never" style="margin-top: 20px;">
+      <template #header>
+        <div class="card-header">GPU内存使用</div>
+      </template>
+
+      <div class="chart-wrapper">
+        <div ref="chartRef2" class="echart"></div>
       </div>
     </el-card>
   </div>
