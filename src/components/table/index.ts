@@ -432,6 +432,22 @@ export const appOptButtons = (): OptButton[] => {
         },
         {
             render: 'tipButton',
+            name: 'resourceConfig',
+            title: '资源配置',
+            text: '',
+            type: 'text',
+            icon: 'fa fa-sliders',
+            class: 'table-opt-button',
+            disabledTip: false,
+            click: async (row, field, baTable: baTableClass) => {
+                // TODO: 打开编辑器
+                // window.open('http://192.168.28.220/code', '_blank');
+                const editorUrl = `${window.location.protocol}//${window.location.hostname}:5173/?appPath=${row.app_path}&appName=${row.app_name}`;
+                window.open(editorUrl, '_blank');
+            },
+        },
+        {
+            render: 'tipButton',
             name: 'edit',
             title: 'Edit',
             text: '',
