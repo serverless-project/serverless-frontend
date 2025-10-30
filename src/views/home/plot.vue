@@ -151,12 +151,25 @@ function updateChart2() {
       nameLocation: 'middle',
       nameGap: 50,
       nameTextStyle: { fontSize: 14 },
-      scale: true,
+      min: 0.5,
+      max: 18,
+      splitNumber: 20,
       axisLine: { show: false },
       axisLabel: { 
         color: '#666', 
         fontSize: 13,
         show: true,
+        formatter: (value: number) => {
+          // 只显示指定的刻度值
+          const ticks = [1, 2, 4, 8, 16]
+          // 使用更宽松的匹配条件
+          for (const tick of ticks) {
+            if (Math.abs(value - tick) < 1) {
+              return tick.toString()
+            }
+          }
+          return ''
+        }
       },
       splitLine: { 
         show: true,
