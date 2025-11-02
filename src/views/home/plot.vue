@@ -18,6 +18,30 @@ let chart2: echarts.ECharts | null = null
 const timelineData = ref<number[]>([])
 const baselineData = ref<number[]>([])
 
+// 速率比较图表
+const chartRef3 = ref<HTMLDivElement | null>(null)
+let chart3: echarts.ECharts | null = null
+
+// 速率数据
+interface RateSeries {
+  [container: string]: number[][]
+}
+const rxRateHistoryData = ref<RateSeries>({})
+const rxRateHistoryOptData = ref<RateSeries>({})
+
+// 持续时间比较图表
+const chartRef4 = ref<HTMLDivElement | null>(null)
+let chart4: echarts.ECharts | null = null
+
+// 持续时间数据
+const durationData = ref<{
+  rx_rate_history: { stage0_0: number; stage0_1: number }
+  rx_rate_history_opt: { stage0_0: number; stage0_1: number }
+}>({
+  rx_rate_history: { stage0_0: 0, stage0_1: 0 },
+  rx_rate_history_opt: { stage0_0: 0, stage0_1: 0 }
+})
+
 function initChart() {
   if (!chartRef.value) return
   chart = echarts.init(chartRef.value)
@@ -219,9 +243,214 @@ function updateChart2() {
   })
 }
 
+// 从数据中提取时间序列
+function extractSeries(data: RateSeries, containerName: string): { times: number[]; rates: number[] } {
+  const series = data[containerName] || []
+  if (!series || series.length === 0) {
+    return { times: [], rates: [] }
+  }
+  const baseTs = series[0][1]
+  const times = series.map(item => (item[1] - baseTs) / 1000.0)
+  const rates = series.map(item => item[0])
+  return { times, rates }
+}
+
+// 计算持续时间
+function calcDuration(data: RateSeries, containerName: string): number {
+  const series = data[containerName] || []
+  if (!series || series.length === 0) {
+    return 0.0
+  }
+  return (series[series.length - 1][1] - series[0][1]) / 1000.0
+}
+
+function initChart3() {
+  if (!chartRef3.value) return
+  chart3 = echarts.init(chartRef3.value)
+  updateChart3()
+}
+
+function updateChart3() {
+  if (!chart3) return
+
+  const containers = ['mlpipe-gpu-para-stage0-0', 'mlpipe-gpu-para-stage0-1']
+  const series1 = extractSeries(rxRateHistoryData.value, containers[0])
+  const series2 = extractSeries(rxRateHistoryData.value, containers[1])
+  const series3 = extractSeries(rxRateHistoryOptData.value, containers[0])
+  const series4 = extractSeries(rxRateHistoryOptData.value, containers[1])
+
+  // 检查是否有数据
+  if (series1.times.length === 0 && series3.times.length === 0) {
+    return
+  }
+
+  chart3.setOption({
+    title: {
+      text: 'Rate comparison for two files',
+      left: 'center',
+      top: 8,
+      textStyle: { fontSize: 16, fontWeight: 600 }
+    },
+    tooltip: {
+      trigger: 'axis',
+      formatter: (params: any) => {
+        const lines: string[] = []
+        params.forEach((p: any) => {
+          const yValue = Array.isArray(p.value) ? p.value[1] : p.value
+          lines.push(`${p.seriesName}: ${yValue.toFixed(2)} Mbps`)
+        })
+        if (lines.length === 0) return ''
+        const xValue = params[0].axisValue || params[0].name
+        return `Time: ${xValue.toFixed(2)} s<br/>${lines.join('<br/>')}`
+      }
+    },
+    grid: { left: 80, right: 40, top: 50, bottom: 70 },
+    xAxis: {
+      type: 'value',
+      name: 'Time (s)',
+      nameLocation: 'middle',
+      nameGap: 30,
+      nameTextStyle: { fontSize: 14 },
+      axisLine: { lineStyle: { color: '#999' } },
+      axisTick: { show: true },
+      axisLabel: { color: '#666', margin: 12, fontSize: 13 },
+      splitLine: { lineStyle: { color: '#eee' } },
+    },
+    yAxis: {
+      type: 'value',
+      name: 'Rate (Mbps)',
+      nameTextStyle: { fontSize: 14 },
+      axisLine: { show: false },
+      splitLine: { lineStyle: { color: '#eee' } },
+      axisLabel: { color: '#666', fontSize: 13 },
+    },
+    series: [
+      {
+        type: 'line',
+        name: 'rx_rate_history - stage0-0',
+        data: series1.times.map((t, i) => [t, series1.rates[i]]),
+        lineStyle: { color: '#409eff', width: 1.5 },
+        itemStyle: { color: '#409eff' },
+        symbolSize: 4,
+      },
+      {
+        type: 'line',
+        name: 'rx_rate_history - stage0-1',
+        data: series2.times.map((t, i) => [t, series2.rates[i]]),
+        lineStyle: { color: '#409eff', width: 1.5, type: 'dashed' },
+        itemStyle: { color: '#409eff' },
+        symbolSize: 4,
+      },
+      {
+        type: 'line',
+        name: 'rx_rate_history_opt - stage0-0',
+        data: series3.times.map((t, i) => [t, series3.rates[i]]),
+        lineStyle: { color: '#e6a23c', width: 1.5 },
+        itemStyle: { color: '#e6a23c' },
+        symbolSize: 4,
+      },
+      {
+        type: 'line',
+        name: 'rx_rate_history_opt - stage0-1',
+        data: series4.times.map((t, i) => [t, series4.rates[i]]),
+        lineStyle: { color: '#e6a23c', width: 1.5, type: 'dashed' },
+        itemStyle: { color: '#e6a23c' },
+        symbolSize: 4,
+      },
+    ],
+    legend: {
+      bottom: 10,
+      left: 'center',
+    },
+  })
+}
+
+function initChart4() {
+  if (!chartRef4.value) return
+  chart4 = echarts.init(chartRef4.value)
+  updateChart4()
+}
+
+function updateChart4() {
+  if (!chart4) return
+
+  const data = durationData.value
+  if (data.rx_rate_history.stage0_0 === 0 && data.rx_rate_history_opt.stage0_0 === 0) {
+    return
+  }
+
+  chart4.setOption({
+    title: {
+      text: 'Stacked duration comparison',
+      left: 'center',
+      top: 8,
+      textStyle: { fontSize: 16, fontWeight: 600 }
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      formatter: (params: any) => {
+        let result = `${params[0].name}<br/>`
+        params.forEach((p: any) => {
+          result += `${p.seriesName}: ${p.value.toFixed(2)} s<br/>`
+        })
+        return result
+      }
+    },
+    grid: { left: 80, right: 40, top: 50, bottom: 70 },
+    xAxis: {
+      type: 'category',
+      data: ['rx_rate_history', 'rx_rate_history_opt'],
+      axisLine: { lineStyle: { color: '#999' } },
+      axisTick: { show: true },
+      axisLabel: { 
+        color: '#666', 
+        margin: 12, 
+        fontSize: 13,
+        rotate: 15
+      },
+    },
+    yAxis: {
+      type: 'value',
+      name: 'Duration (s)',
+      nameTextStyle: { fontSize: 14 },
+      axisLine: { show: false },
+      splitLine: { lineStyle: { color: '#eee' } },
+      axisLabel: { color: '#666', fontSize: 13 },
+    },
+    series: [
+      {
+        type: 'bar',
+        name: 'file1 stage0-0',
+        stack: 'duration',
+        data: [data.rx_rate_history.stage0_0, data.rx_rate_history_opt.stage0_0],
+        itemStyle: {
+          color: '#409eff',
+        },
+        barWidth: '60%',
+      },
+      {
+        type: 'bar',
+        name: 'file1 stage0-1',
+        stack: 'duration',
+        data: [data.rx_rate_history.stage0_1, data.rx_rate_history_opt.stage0_1],
+        itemStyle: {
+          color: '#67c23a',
+        },
+      },
+    ],
+    legend: {
+      bottom: 10,
+      left: 'center',
+    },
+  })
+}
+
 function resizeChart() {
   if (chart) chart.resize()
   if (chart2) chart2.resize()
+  if (chart3) chart3.resize()
+  if (chart4) chart4.resize()
 }
 
 async function loadData() {
@@ -256,9 +485,42 @@ async function loadPerformanceIsolationData() {
   }
 }
 
+async function loadRxRateHistoryData() {
+  try {
+    const resp = await createAxios({ url: '/plot/network-optimization', method: 'get' })
+    const data = resp?.data?.data || {}
+    
+    // 提取两个文件的数据：history 对应 rx_rate_history，opt 对应 rx_rate_history_opt
+    rxRateHistoryData.value = data.history || {}
+    rxRateHistoryOptData.value = data.opt || {}
+    
+    // 计算持续时间
+    const containers = ['mlpipe-gpu-para-stage0-0', 'mlpipe-gpu-para-stage0-1']
+    durationData.value = {
+      rx_rate_history: {
+        stage0_0: calcDuration(rxRateHistoryData.value, containers[0]),
+        stage0_1: calcDuration(rxRateHistoryData.value, containers[1])
+      },
+      rx_rate_history_opt: {
+        stage0_0: calcDuration(rxRateHistoryOptData.value, containers[0]),
+        stage0_1: calcDuration(rxRateHistoryOptData.value, containers[1])
+      }
+    }
+    
+    // 更新图表
+    updateChart3()
+    updateChart4()
+  } catch (e: any) {
+    ElMessage.error(e?.message || '网络优化数据加载失败')
+  }
+}
+
 onMounted(() => {
   initChart()
   loadData()
+  initChart3()
+  loadRxRateHistoryData()
+  initChart4()
   initChart2()
   loadPerformanceIsolationData()
   window.addEventListener('resize', resizeChart)
@@ -274,6 +536,14 @@ onBeforeUnmount(() => {
     chart2.dispose()
     chart2 = null
   }
+  if (chart3) {
+    chart3.dispose()
+    chart3 = null
+  }
+  if (chart4) {
+    chart4.dispose()
+    chart4 = null
+  }
 })
 </script>
 
@@ -286,6 +556,26 @@ onBeforeUnmount(() => {
 
       <div class="chart-wrapper">
         <div ref="chartRef" class="echart"></div>
+      </div>
+    </el-card>
+
+    <el-card shadow="never" style="margin-top: 20px;">
+      <template #header>
+        <div class="card-header">速率比较</div>
+      </template>
+
+      <div class="chart-wrapper">
+        <div ref="chartRef3" class="echart"></div>
+      </div>
+    </el-card>
+
+    <el-card shadow="never" style="margin-top: 20px;">
+      <template #header>
+        <div class="card-header">持续时间比较</div>
+      </template>
+
+      <div class="chart-wrapper">
+        <div ref="chartRef4" class="echart"></div>
       </div>
     </el-card>
 
