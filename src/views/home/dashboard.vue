@@ -40,6 +40,12 @@ interface DataItem {
   mem_size: number
   disk_size: number
   applications?: string[] // 从API获取的应用信息(多个字符串)
+  gpu_info?: {
+    vgpu: number
+    vgpu_in_use: number
+    vgpu_memory: number
+    vgpu_memory_in_use: number
+  }
 }
 
 const nodes = ref<DataItem[]>([])
@@ -68,6 +74,12 @@ const valid_disk = computed(() => {
     .reduce((sum, item) => sum + item.disk_size, 0)
 });
 
+const valid_vgpu = computed(() => {
+  return nodes.value
+    .filter(item => !invaild_nodes.value.includes(item.node_name))
+    .reduce((sum, item) => sum + (item.gpu_info?.vgpu || 0), 0)
+});
+
 const valid_node_number = computed(() => {
   return nodes.value
     .filter(item => !invaild_nodes.value.includes(item.node_name))
@@ -91,12 +103,10 @@ async function fetchNodes() {
       invaild_nodes.value = res.data.invaild_nodes || [];
       panelsRef.value[1].number = valid_node_number.value;
       panelsRef.value[2].number = valid_mem.value;
-      // panelsRef.value[3].details = 
-      //   {
-      //     cpus: { count: valid_cpu.value, unit: '核 CPU' },
-      //     gpus: { count: 0, unit: '个 GPU' }
-      //   };
-      panelsRef.value[3].number = valid_cpu.value;
+      panelsRef.value[3].details = {
+        cpus: { count: valid_cpu.value, unit: 'CPU' },
+        gpus: { count: valid_vgpu.value, unit: 'vGPU' }
+      };
       panelsRef.value[4].number = valid_disk.value;
     }
   }).catch((err) => {
@@ -491,6 +501,13 @@ watch(
                   <div>计算: {{ row.cpu_number }} CPU 核</div>
                   <div>内存: {{ row.mem_size }} GB</div>
                   <div>存储: {{ row.disk_size }} GB</div>
+                  <div v-if="row.gpu_info">
+                    GPU: {{ row.gpu_info.vgpu }} vGPU
+                    <span v-if="row.gpu_info.vgpu_in_use > 0">
+                      (已使用: {{ row.gpu_info.vgpu_in_use }})
+                    </span>
+                  </div>
+                  <div v-else>GPU: 0 vGPU</div>
                 </div>
               </template>
             </el-table-column>
