@@ -439,6 +439,9 @@ export const appOptButtons = (): OptButton[] => {
             icon: 'fa fa-sliders',
             class: 'table-opt-button',
             disabledTip: false,
+            display: (row: TableRow, field: TableColumn) => {
+                return row.app_name === 'HotelReserve' || row.app_name === 'MLPipe';
+            },
             click: async (row, field, baTable: baTableClass) => {
                 // TODO: 打开编辑器
                 // window.open('http://192.168.28.220/code', '_blank');
