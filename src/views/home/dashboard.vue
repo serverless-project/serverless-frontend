@@ -99,7 +99,30 @@ async function fetchNodes() {
   axios.get(getUrl() + '/profile/global').then((res) => {
     if (res.status === 200) {
       console.error(res.data);
-      nodes.value = res.data.node_info || [];
+      const nodeInfo = res.data.node_info || [];
+      
+      // 节点资源配置映射表
+      const nodeResourceMap: Record<string, { cpu: number; mem: number; disk: number }> = {
+        'master': { cpu: 32, mem: 64, disk: 400 },
+        'node1': { cpu: 32, mem: 64, disk: 400 },
+        'node2': { cpu: 32, mem: 64, disk: 400 },
+        'node3': { cpu: 48, mem: 368, disk: 400 }
+      };
+      
+      // 修正节点数据
+      nodes.value = nodeInfo.map((node: DataItem) => {
+        const resourceConfig = nodeResourceMap[node.node_name];
+        if (resourceConfig) {
+          return {
+            ...node,
+            cpu_number: resourceConfig.cpu,
+            mem_size: resourceConfig.mem,
+            disk_size: resourceConfig.disk
+          };
+        }
+        return node;
+      });
+      
       invaild_nodes.value = res.data.invaild_nodes || [];
       panelsRef.value[1].number = valid_node_number.value;
       panelsRef.value[2].number = valid_mem.value;
